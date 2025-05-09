@@ -12,23 +12,17 @@ import "./App.scss";
 // import { AuthProvider } from "./services/auth";
 
 function App() {
-  const renderRoutes = (routes: any[]) => {
-    return routes.map((route) => (
-      <Route key={route.path} path={route.path} element={route.element}>
-        {route.children && renderRoutes(route.children)}
-      </Route>
-    ));
-  };
-
   return (
-    <div>
-      {/* Placeholder content until you're ready to uncomment the router setup */}
-      <h1>App Component</h1>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<div>Home Page</div>} />
+      </Routes>
+    </Router>
   );
 }
 
 export default App;
+
 // <Router>
 //   <AuthProvider>
 //     <Routes>

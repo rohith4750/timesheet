@@ -1,0 +1,173 @@
+.phone-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+
+  .select-container {
+    position: relative;
+    width: 100%;
+
+    .input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--color-neutral-text-300);
+      border-radius: var(--border-radius-lg);
+      transition: var(--transition-default);
+      background-color: var(--color-background-background-light);
+    }
+
+    &.small .input {
+      padding: var(--spacing-space-8);
+      font-size: var(--font-size-xs);
+    }
+
+    &.medium .input {
+      height: var(--input-height-lg, 48px);
+      padding: 8px var(--input-padding-horizontal, 12px);
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      align-self: stretch;
+      border-radius: var(--input-border-radius, 8px);
+      border: 1px solid var(--input-border-default, #7b7b7b);
+      background: var(--input-default, #fff);
+      box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.15);
+    }
+
+    &.large .input {
+      padding: var(--spacing-space-12) var(--spacing-space-28);
+      font-size: var(--font-size-sm);
+    }
+
+    .input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 48px;
+      padding: 8px var(--input-padding-horizontal, 12px);
+      font-size: var(--font-size-med);
+      background-color: var(-color-background-background-light);
+      font-size: var(--size-medium-font);
+      font-family: var(--font-family-open-sans);
+      border-radius: var(--input-border-radius, 8px);
+      border: 1px solid var(--input-border-default, #7b7b7b);
+      background: var(--input-default, #fff);
+      box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.15);
+
+      &:hover {
+        border-color: var(--color-primary-primary-500);
+      }
+
+      &:focus {
+        border: 1px solid var(--color-neutral-text-500);
+        box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.15);
+      }
+
+      &.error {
+        border-color: var(--border-error);
+        &:focus {
+          border-color: var(--border-error);
+          box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+        }
+      }
+
+      &.disabled {
+        background-color: var(--color-neutral-text-100);
+        color: var(--color-neutral-text-500);
+        cursor: not-allowed;
+        border-color: var(--color-neutral-text-100);
+      }
+
+      .country-selector {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+
+        &.disabled {
+          cursor: not-allowed;
+        }
+
+        img {
+          width: 20px;
+          height: 16px;
+
+          &.dropdown-icon {
+            width: 12px;
+            height: 10px;
+            transition: transform 0.2s ease;
+          }
+
+          &.dropdown-icon.open {
+            transform: rotate(180deg);
+          }
+        }
+      }
+
+      input {
+        border: none;
+        outline: none;
+        background: transparent;
+        width: 100%;
+        color: var(--color-primary-primary-500);
+
+        &::placeholder {
+          color: var(--color-neutral-text-400);
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .select-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 4px;
+      background: white;
+      border: 1px solid var(--color-neutral-text-300);
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+
+      .select-option {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: var(--color-neutral-text-100);
+        }
+
+        img {
+          width: 24px;
+          height: 24px;
+          margin-right: 8px;
+        }
+
+        span {
+          color: var(--card-text-text-primary, #3a3a3a);
+
+          /* Body Large */
+          font-family: var(--font-family-open-sans, Poppins);
+          font-size: var(--font-size-med, 16px);
+          font-style: normal;
+          font-weight: 400;
+          line-height: var(--line-height-base, 24px); /* 150% */
+        }
+      }
+    }
+  }
+
+  .error-message {
+    color: var(--color-error-500);
+    font-size: 12px;
+    margin-top: 4px;
+  }
+}

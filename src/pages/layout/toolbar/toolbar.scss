@@ -1,0 +1,178 @@
+.toolbar {
+    display: flex;
+    justify-content: end;
+    // align-items: center;
+    padding: 10px 20px;
+    background-color: var(--white-three);
+    height: 2.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+
+    /* Center Section */
+    .toolbar-heading {
+        flex: 1; // Takes the space between left and right sections
+        text-align: center;
+        font-size: 24px;
+        font-weight: 400;
+        color: #556ed8;
+        margin: 0;
+    }
+
+    /* Right Section */
+    .profile-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        // margin-top: 0.95rem;
+
+        .profile-dropdown {
+            width: 20px;
+            height: 20px;
+            margin-left: 20px;
+
+            &.rotated {
+                transform: rotate(180deg);
+            }
+        }
+
+        .profile-name {
+            margin-left: 10px;
+            font-size: 15px;
+            font-weight: 450;
+        }
+
+        .profile-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%; // Circular profile icon
+            position: relative;
+            // right: 10px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0px;
+            margin-left: 10px;
+
+            .user-name {
+                font-size: 14px;
+                font-weight: 500;
+                color: var(--black);
+                word-wrap: break-word;
+                word-break: break-word;
+                white-space: normal;
+                overflow-wrap: break-word;
+                max-width: 180px;
+            }
+
+            .user-email {
+                font-size: 12px;
+                color: var(--black);
+            }
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            width: 100%;
+            top: calc(100% + 5px);
+            right: 0;
+            background-color: #ffffff;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            min-width: 10rem;
+            padding: 8px 0;
+            z-index: 1000;
+
+            .dropdown-item {
+                position: relative;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+                text-align: left;
+                font-size: 14px;
+                color: var(--black);
+                transition: background-color 0.2s ease;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: var(--blue-one);
+
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 4px;
+                        height: 100%;
+                        background-color: var(--blue-three);
+                    }
+                }
+
+                &:active {
+                    background-color: var(--blue-one);
+                }
+
+                // .dropdown-divider {
+                //   margin: 0.5rem 1rem;
+                //   border-top: 1px solid #014861;
+                // }
+            }
+        }
+    }
+
+    .temporary-pswd-blk {
+        display: flex;
+        background-color: #ffffe5;
+        padding: 2px 5px;
+        justify-content: center;
+        align-items: center;
+
+        p {
+            font-size: 0.8rem;
+            letter-spacing: 0.1rem;
+        }
+    }
+
+    .notification-icon {
+        box-sizing: border-box;
+        position: relative;
+
+        .icon-img {
+            width: 20px;
+            // height: 25px;
+            margin: 10px 20px 0px;
+            cursor: pointer;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            width: 100%;
+            top: 100%;
+            right: 0;
+            background-color: var(--white-three);
+            border: 1px solid var(--gray-twelve);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            z-index: 1000;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            min-width: 350px;
+            max-width: 350px;
+
+            .view-all {
+                text-align: right;
+                color: var(--blue-twelve);
+                font-weight: 500;
+                cursor: pointer;
+                display: block;
+                font-size: 0.8rem;
+            }
+        }
+    }
+}

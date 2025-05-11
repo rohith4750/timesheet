@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import "../../root.scss";
 import "./input-component.scss";
 import DropDownIcon from "../../assets/icons/DropDownIcon-sm.svg";
 import EyeOpen from "../../assets/icons/open-icon.svg";

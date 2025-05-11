@@ -1,6 +1,10 @@
 /* Primitive Colors */
 
 :root {
+  /* Font Families */
+  --font-family-base: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  --font-family-code: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+
   /* Mode 1 */
   /* color */
 
@@ -393,6 +397,13 @@
   --input-height-med: var(--spacing-space-44);
   --input-height-lg: var(--spacing-space-48);
   --input-padding-horizontal: var(--spacing-standard-med);
+
+  /* Font families */
+  --font-family-base: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+  --font-family-code: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
 }
 
 h1 {

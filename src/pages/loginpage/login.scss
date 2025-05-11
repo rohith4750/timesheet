@@ -1,0 +1,88 @@
+@import "../../root.scss";
+
+.login-container {
+  width: 100%;
+  height: 100vh; // Fixed height
+  background-color: var(--background-color);
+  display: flex;
+  flex-direction: row;
+  overflow: hidden; // Prevent scrollbars
+}
+
+.login-left {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--white);
+  overflow: hidden; // Prevent child scroll
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  transform: scale(0.9);
+  font-family: var(--font-family-open-sans);
+  .logo {
+    width: 220px;
+    margin-bottom: 10px;
+  }
+  p {
+    margin-bottom: -20px;
+  }
+
+  h1 {
+    margin-bottom: 1rem;
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-space-20);
+
+    .forgot-password {
+      text-align: right;
+      margin: -10px 0 8px;
+
+      a {
+        color: var(--color-info-info-500);
+        text-decoration: none;
+        font-size: 14px;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+.login-right {
+  width: 100%;
+  display: flex;
+  padding: 50px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1 0 0;
+  align-self: stretch;
+  border-radius: 14px;
+  margin-left: 80px;
+
+  .right-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 40px;
+  }
+
+  .design-system-cover {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+  }
+}

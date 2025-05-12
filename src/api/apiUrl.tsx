@@ -7,4 +7,6 @@ export const apiUrl = {
   DEL_deleteUser: (id: any) => `delete/user/${id}`, // users
   GET_loggedInUserSno : `list/logged-in-user_sno/`,
   GET_checkIsSuperAdmin: `check/is_super_admin/`,
+
+  POST_login: `login`, //login
 }

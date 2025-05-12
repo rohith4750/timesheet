@@ -1,84 +1,110 @@
 import React from "react";
 import {
-    createContext,
-    useContext,
-    useState,
-    useEffect,
-    ReactNode,
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
 } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 interface AuthContextType {
-    isAuthenticated: boolean;
-    login: (user_email: string, password: string) => Promise<void>;
-    logout: () => void;
-    user: any | null;
-    alerts: Array<{ type: "error" | "warning" | "success" | "info"; text: string; duration?: number }>;
-    setAlerts: (alerts: Array<{ type: "error" | "warning" | "success" | "info"; text: string; duration?: number }>) => void;
+  isAuthenticated: boolean;
+  login: (user_email: string, password: string) => Promise<void>;
+  logout: () => void;
+  user: any | null;
+  alerts: Array<{
+    type: "error" | "warning" | "success" | "info";
+    text: string;
+    duration?: number;
+  }>;
+  setAlerts: (
+    alerts: Array<{
+      type: "error" | "warning" | "success" | "info";
+      text: string;
+      duration?: number;
+    }>
+  ) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error("useAuth must be used within an AuthProvider");
-    }
-    return context;
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };
 
 interface AuthProviderProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-    const [user, setUser] = useState<any | null>(null);
-    const [alerts, setAlerts] = useState<Array<{ type: "error" | "warning" | "success" | "info"; text: string; duration?: number }>>([]);
-    const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [user, setUser] = useState<any | null>(null);
+  const [alerts, setAlerts] = useState<
+    Array<{
+      type: "error" | "warning" | "success" | "info";
+      text: string;
+      duration?: number;
+    }>
+  >([]);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const token = localStorage.getItem("accesstoken");
-        if (token) {
-            setIsAuthenticated(true);
-            // TODO: Fetch user data if needed
-        }
-    }, []);
+  useEffect(() => {
+    const token = localStorage.getItem("accesstoken");
+    if (token) {
+      setIsAuthenticated(true);
+      // TODO: Fetch user data if needed
+    }
+  }, []);
 
-    const login = async (user_email: string, password: string) => {
-        try {
-            // Static credential validation
-            if (user_email === "harsha.vardhan16795@gmail.com" && password === "Pycube123$") {
-                // Mock successful login
-                const mockToken = "mock-token-" + Date.now();
-                localStorage.setItem("token", mockToken);
-                setIsAuthenticated(true);
-                setUser({ username: user_email });
-                setAlerts([{ type: "success", text: "Successfully logged in!", duration: 3000 }]);
-                navigate("/home");
-            } else {
-                throw new Error("Invalid credentials");
-            }
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(error.message);
-            }
-            throw new Error("An unexpected error occurred");
-        }
-    };
+  const login = async (user_email: string, password: string) => {
+    try {
+      const response = await fetch("http://localhost:3001/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user_email, password }),
+      });
 
-    const logout = () => {
-        localStorage.removeItem("token");
-        setIsAuthenticated(false);
-        setUser(null);
-        navigate("/login");
-    };
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || response.statusText);
+      }
 
-    return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout, user, alerts, setAlerts }}>
-            {/* <Alerts alerts={alerts} setAlerts={setAlerts} /> */}
-            {children}
-        </AuthContext.Provider>
-    );
+      const data = await response.json();
+      localStorage.setItem("token", data.token);
+      setIsAuthenticated(true);
+      setUser({ username: user_email });
+      setAlerts([
+        { type: "success", text: "Successfully logged in!", duration: 3000 },
+      ]);
+      navigate("/home");
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error("An unexpected error occurred");
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
+    setUser(null);
+    navigate("/login");
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{ isAuthenticated, login, logout, user, alerts, setAlerts }}
+    >
+      {/* <Alerts alerts={alerts} setAlerts={setAlerts} /> */}
+      {children}
+    </AuthContext.Provider>
+  );
 };

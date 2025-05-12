@@ -47,20 +47,14 @@ const Login: React.FC = () => {
 
     if (validateForm()) {
       try {
-        const response = await loginUser(formData);
-        if (response.success) {
-          await login(formData.user_email, formData.password);
-          navigate("/home-page");
-        } else {
-          setErrors({
-            user_email: response.message || "Login failed. Please try again.",
-          });
-        }
+        await login(formData.user_email, formData.password);
+        navigate("/home-page");
       } catch (error) {
         setErrors({
-          user_email: "An error occurred. Please try again.",
+          user_email: (error as Error).message || "Login failed. Please try again.",
         });
       }
+      
     }
   };
 

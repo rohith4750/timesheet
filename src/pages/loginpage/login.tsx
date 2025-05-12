@@ -8,13 +8,13 @@ import "./login.scss";
 import logo from "../../assets/icons/pycube-logo.svg";
 import design from "../../assets/icons/login-right.svg";
 interface LoginFormData {
-  email: string;
+  user_email: string;
   password: string;
 }
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState<LoginFormData>({
-    email: "",
+    user_email: "",
     password: "",
   });
 
@@ -23,10 +23,10 @@ const Login: React.FC = () => {
   const validateForm = () => {
     const newErrors: Partial<LoginFormData> = {};
 
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
+    if (!formData.user_email) {
+      newErrors.user_email = "user_email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.user_email)) {
+      newErrors.user_email = "Please enter a valid user_email";
     }
 
     if (!formData.password) {
@@ -49,16 +49,16 @@ const Login: React.FC = () => {
       try {
         const response = await loginUser(formData);
         if (response.success) {
-          await login(formData.email, formData.password);
+          await login(formData.user_email, formData.password);
           navigate("/home-page");
         } else {
           setErrors({
-            email: response.message || "Login failed. Please try again.",
+            user_email: response.message || "Login failed. Please try again.",
           });
         }
       } catch (error) {
         setErrors({
-          email: "An error occurred. Please try again.",
+          user_email: "An error occurred. Please try again.",
         });
       }
     }
@@ -76,11 +76,11 @@ const Login: React.FC = () => {
               type="email"
               label="Email"
               placeholder="Enter your email"
-              value={formData.email}
+              value={formData.user_email}
               onChange={(value) =>
-                setFormData({ ...formData, email: value as string })
+                setFormData({ ...formData, user_email: value as string })
               }
-              error={errors.email}
+              error={errors.user_email}
             />
 
             <InputField

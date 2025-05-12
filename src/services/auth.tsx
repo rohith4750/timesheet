@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
     isAuthenticated: boolean;
-    login: (login_username: string, login_password: string) => Promise<void>;
+    login: (user_email: string, password: string) => Promise<void>;
     logout: () => void;
     user: any | null;
     alerts: Array<{ type: "error" | "warning" | "success" | "info"; text: string; duration?: number }>;
@@ -39,22 +39,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("accesstoken");
         if (token) {
             setIsAuthenticated(true);
             // TODO: Fetch user data if needed
         }
     }, []);
 
-    const login = async (login_username: string, login_password: string) => {
+    const login = async (user_email: string, password: string) => {
         try {
             // Static credential validation
-            if (login_username === "admin@pycube.com" && login_password === "Pycube123$") {
+            if (user_email === "harsha.vardhan16795@gmail.com" && password === "Pycube123$") {
                 // Mock successful login
                 const mockToken = "mock-token-" + Date.now();
                 localStorage.setItem("token", mockToken);
                 setIsAuthenticated(true);
-                setUser({ username: login_username });
+                setUser({ username: user_email });
                 setAlerts([{ type: "success", text: "Successfully logged in!", duration: 3000 }]);
                 navigate("/home");
             } else {

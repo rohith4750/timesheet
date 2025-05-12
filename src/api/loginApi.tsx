@@ -1,5 +1,5 @@
 interface LoginFormData {
-  email: string;
+  user_email: string;
   password: string;
 }
 

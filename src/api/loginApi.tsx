@@ -10,7 +10,8 @@ interface LoginResponse {
 }
 
 interface ApiLoginResponse {
-  token: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export const loginUser = async (
@@ -33,7 +34,7 @@ export const loginUser = async (
     const data: ApiLoginResponse = await response.json();
     return {
       success: true,
-      token: data.token,
+      token: data.accessToken,
     };
   } catch (error) {
     return {

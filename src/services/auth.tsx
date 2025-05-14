@@ -54,7 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("accesstoken");
+    const token = localStorage.getItem("accessToken");
     if (token) {
       setIsAuthenticated(true);
       // TODO: Fetch user data if needed
@@ -77,7 +77,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       const data = await response.json();
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("accessToken", data.accessToken);
       setIsAuthenticated(true);
       setUser({ username: user_email });
       setAlerts([
@@ -93,7 +93,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("accessToken");
     setIsAuthenticated(false);
     setUser(null);
     navigate("/login");

@@ -1,6 +1,9 @@
 import React from "react";
 import HomePage from "../pages/home-page/home-page";
-import { MenuItem ,menuItems} from "./menu";
+import { MenuItem, menuItems } from "./menu";
+import TaskList from "../pages/task/tasklist";
+import AddTask from "../pages/task/add-task/add-task";
+import EditTask from "../pages/task/edit-task/edit-task";
 
 export interface RouteConfig extends Omit<MenuItem, "icon" | "label"> {
   element: React.ReactNode;
@@ -8,7 +11,10 @@ export interface RouteConfig extends Omit<MenuItem, "icon" | "label"> {
 }
 
 const componentMap: Record<string, React.ReactNode> = {
-    "/home-page":<HomePage/>
+    "/home-page":<HomePage/>,
+    "/task": <TaskList />,
+    "/task/add": <AddTask />,
+    "/task/edit": <EditTask />
 //   "/tab-navigation": <TabNavigationDemo />,
 //   "/home": <HomePage />,
 //   "/healthcare": <InputFieldPage />,

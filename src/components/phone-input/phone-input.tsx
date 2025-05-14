@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./phone-input.scss";
-import usaFlag from "../../../assets/flags/usa.svg";
-import dropDown from "../../../assets/icons/DropDownIcon-xs.svg";
-
+import usaFlag from "src/assets/flags/usa.svg";
+//import dropDown from "src/assets/icons/DropDownIcon-xs.svg";
+import DropDown from "src/assets/icons/DropDownIcon-xs.svg";
 interface PhoneInputProps {
   size?: "small" | "medium" | "large";
   placeholder?: string;
@@ -146,7 +146,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
           >
             <img src={selectedCountry.flag} alt={selectedCountry.country} />
             <img
-              src={dropDown}
+              src={DropDown}
               alt="dropdown"
               className="dropdown-icon"
               style={{

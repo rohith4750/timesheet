@@ -1,25 +1,23 @@
 import { useNavigate } from "react-router";
 import { useState, useEffect, useCallback, useRef } from "react";
-import "./common-table.scss";
 import { useSelector } from "react-redux";
-import editIcon from "src/assets/images/save-icon.svg";
-import deleteIcon from "src/assets/images/delete-icon.svg";
-
-const getActiveClass = (type: string): string => {
-  return `action-btn ${type.toLowerCase()}-btn`;
-};
-import settingsIcon from "../../../assets/images/settings.svg";
 import { permissionAccess } from "../../hooks/permissionAccess";
-//import ProgressBar from "src/component/shared/progress-bar/progress-bar";
-import plus from "../../../assets/icons/plus.svg";
 import useDebounce from "../../hooks/debounce";
-//import LoaderSpinner from "src/component/shared/loader-spinner/loaderSpinner";
-import refreshIcon from "../../../assets/images/restart.svg";
-import deletePopup from "../../../assets/images/delete-popup.svg";
 import {
   selectSetupData,
   selectSetupStatus,
 } from "../../store/reducers/dashboard";
+import editIcon from "src/assets/images/save-icon.svg";
+import deleteIcon from "src/assets/images/delete-icon.svg";
+import settingsIcon from "src/assets/images/settings.svg";
+import plus from "src/assets/icons/plus.svg";
+import refreshIcon from "src/assets/images/restart.svg";
+import deletePopup from "src/assets/images/delete-popup.svg";
+import "./common-table.scss";
+
+const getActiveClass = (type: string): string => {
+  return `action-btn ${type.toLowerCase()}-btn`;
+};
 
 interface TableComponentProps {
   columns: {
@@ -436,4 +434,4 @@ export default function TableComponent({
     </>
   );
 }
-const [actionType, setActionType] = useState<string>('');
+const [actionType, setActionType] = useState<string>("");

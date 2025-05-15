@@ -1,0 +1,110 @@
+.alerts-overlay {
+  position: fixed;
+  top: var(--spacing-space-20);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-space-12);
+  z-index: 1000;
+}
+
+.alert-box {
+  display: flex;
+  align-items: center;
+  background: var(--surface-secondary);
+  border-radius: var(--border-radius-lg);
+  border: var(--border-width-thick-1) solid var(--input-border-default);
+  box-shadow: 0 var(--spacing-space-4) var(--spacing-space-8) rgba(0, 0, 0, 0.1);
+  padding: var(--spacing-space-4) var(--spacing-space-16);
+  min-width: 320px;
+  // position: relative;
+  overflow: hidden;
+}
+
+/* Left Colored Bar - Increased Width */
+.alert-left-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--spacing-space-48); /* Increased width */
+  border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
+}
+
+/* Alert icon container */
+.alert-icon-container {
+  position: absolute;
+  left: var(--spacing-space-16);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--icon-icon-size-lg);
+  color: var(--text-secondary);
+}
+
+/* Alert text styling */
+.alert-content {
+  display: flex;
+  flex-direction: column;
+  margin-left: var(--spacing-space-40);
+  justify-content: flex-start;
+}
+
+.alert-title {
+  text-align: left;
+  font-size: var(--font-size-med);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+}
+
+.alert-message {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+/* Success Alert */
+.success {
+  border-color: var(--color-success-success-500);
+}
+.success .alert-left-bar {
+  background-color: var(--color-success-success-500);
+}
+
+/* Warning Alert */
+.warning {
+  border-color: var(--color-warning-warning-500);
+}
+.warning .alert-left-bar {
+  background-color: var(--color-warning-warning-500);
+}
+
+/* Error Alert */
+.error {
+  border-color: var(--color-alert-alert-500);
+}
+.error .alert-left-bar {
+  background-color: var(--color-alert-alert-500);
+}
+
+/* Info Alert */
+.info {
+  border-color: var(--color-info-info-500);
+}
+.info .alert-left-bar {
+  background-color: var(--color-info-info-500);
+}
+
+.alert-close-btn {
+  background: none;
+  border: none;
+  color: #2940d2;
+  cursor: pointer;
+  position: absolute;
+  right: 12px;
+  line-height: 1;
+
+  button {
+    padding: 0;
+    text-decoration: underline;
+  }
+}

@@ -1,67 +1,73 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import ReusableForm from "../../../components/reusable-form/reusableform";
-import { FormField } from "../../../types/form";
+import "./add-task.scss";
+
+interface TaskFormData {
+  task: string;
+  task_description: string;
+  ut_status: string;
+  task_start_at: string;
+}
 
 const AddTask: React.FC = () => {
   const navigate = useNavigate();
-  const formFields: FormField[] = [
+
+  const formFields = [
     {
       label: "Task Name",
       type: "text",
       name: "task",
       required: true,
-      maxLength: 30,
       placeholder: "Enter task name",
     },
     {
-      label: "Task Description",
-      type: "textarea",
+      label: "Description",
+      type: "text",
       name: "task_description",
       required: true,
-      maxLength: 200,
       placeholder: "Enter task description",
     },
     {
-      label: "Task Status",
+      label: "Status",
       type: "select",
       name: "ut_status",
-      required: true,
       options: [
-        { value: "draft", label: "Draft" },
         { value: "pending", label: "Pending" },
-        { value: "approved", label: "Approved" },
-        { value: "rejected", label: "Rejected" },
+        { value: "in_progress", label: "In Progress" },
+        { value: "completed", label: "Completed" },
       ],
+      defaultValue: "pending",
     },
     {
       label: "Start Date",
       type: "date",
       name: "task_start_at",
       required: true,
+      defaultValue: new Date().toISOString().split("T")[0],
     },
   ];
 
-  const handleSubmit = async (formData: any) => {
-    try {
-      // TODO: Implement API call to create task
-      console.log("Form submitted:", formData);
-      // Navigate to task list after successful submission
-      navigate("/task");
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    }
+  const formConfig = {
+    formTitle: "Add New Task",
+    submitButtonText: "Add Task",
+  };
+
+  const handleSubmit = (formData: TaskFormData) => {
+    // TODO: Implement API call to save task
+    console.log("Submitting task:", formData);
+
+    // Navigate back to task list after submission
+    navigate("/tasks");
   };
 
   return (
     <div className="add-task-container">
+      <h1>Add Task</h1>
       <ReusableForm
         fields={formFields}
         onSubmit={handleSubmit}
-        config={{
-          submitButtonText: "Create Task",
-          formTitle: "Add New Task",
-        }}
+        config={formConfig}
       />
     </div>
   );

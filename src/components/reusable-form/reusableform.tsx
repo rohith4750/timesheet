@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import PhoneInput from "../phone-input/phone-input";
-import whiteTick from "src/assets/icons/white-tick.svg";
-import "./form-setup.scss";
+import whiteTick from "../../assets/icons/white-tick.svg";
+import Button from "../button/button";
+import "./reusableform.scss";
 
 interface Option {
   value: string | number;
@@ -27,27 +28,30 @@ interface FormConfig {
   submitButtonIcon?: string;
   formTitle?: string;
   cssClass?: string;
+  showCancelButton?: boolean;
+  cancelButtonText?: string;
+  onCancel?: () => void;
 }
 
 interface FormData {
   [key: string]: any;
 }
 
-interface ReusableFormProps {
+interface ReusableFormProps<T extends FormData = FormData> {
   fields: FormField[];
-  onSubmit: (formData: FormData) => void;
+  onSubmit: (formData: T) => void;
   config?: FormConfig;
-  initialData?: FormData;
+  initialData?: T;
 }
 
-const ReusableForm: React.FC<ReusableFormProps> = ({
+const ReusableForm = <T extends FormData = FormData>({
   fields,
   onSubmit,
   config,
   initialData,
-}) => {
+}: ReusableFormProps<T>) => {
   const [formFields, setFormFields] = useState([...fields]);
-  const [formData, setFormData] = useState<FormData>(initialData || {});
+  const [formData, setFormData] = useState<T>(initialData || ({} as T));
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string>
   >({});
@@ -129,9 +133,15 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
 
     const isValid = validateForm();
     if (isValid) {
-      onSubmit(formData);
+      onSubmit(formData as T);
     } else {
       setIsSubmitted(true);
+    }
+  };
+
+  const handleCancel = () => {
+    if (config?.onCancel) {
+      config.onCancel();
     }
   };
 
@@ -260,12 +270,23 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
               {renderField(field)}
             </div>
           ))}
-          <button
-            type="submit"
-            className={`submit-button ${config?.cssClass || ""}`}
-          >
-            {config?.submitButtonText || "Submit"}
-          </button>
+          <div className="form-buttons">
+            <Button
+              type="submit"
+              className={`submit-button ${config?.cssClass || ""}`}
+            
+              {config?.submitButtonText || "Submit"}
+           ></Button>
+            {config?.showCancelButton && (
+              <button
+                type="button"
+                className="cancel-button"
+                onClick={handleCancel}
+              >
+                {config?.cancelButtonText || "Cancel"}
+              </button>
+            )}
+          </div>
         </form>
       </div>
     </div>

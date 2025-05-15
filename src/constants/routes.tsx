@@ -11,28 +11,26 @@ export interface RouteConfig extends Omit<MenuItem, "icon" | "label"> {
 }
 
 const componentMap: Record<string, React.ReactNode> = {
-    "/home-page":<HomePage/>,
-    "/task": <TaskList />,
-    "/task/add": <AddTask />,
-    "/task/edit": <EditTask />
-//   "/tab-navigation": <TabNavigationDemo />,
-//   "/home": <HomePage />,
-//   "/healthcare": <InputFieldPage />,
-//   "/phone-number": <PhoneNumberPage />,
-//   "/table": <Table />,
-//   "/buttons": <ButtonsPage />,
-//   "/alerts": <AlertContainer />,
-//   "/icons": <Icons />,
-//   "/colors": <ColorPalette />,
-//   "/typography": <TypographyTable />,
-//   "/login": <Login />,
-//   "/utility": <Utility />,
-//   "/popover-modal": <PopoverModalShowcase />,
+  "/home-page": <HomePage />,
+  "/task": <TaskList />,
+  "/task/add": <AddTask />,
+  "/task/edit": <EditTask />,
 };
 
-export const routes: RouteConfig[] = menuItems
-  .filter((item) => item.isEnabled !== false)
-  .map(({ path }) => ({
-    path,
-    element: componentMap[path],
-  }));
+export const routes: RouteConfig[] = [
+  ...menuItems
+    .filter((item) => item.isEnabled !== false)
+    .map(({ path }) => ({
+      path,
+      element: componentMap[path],
+    })),
+  // Add additional routes that are not in menuItems
+  {
+    path: "/task/add",
+    element: componentMap["/task/add"],
+  },
+  {
+    path: "/task/edit",
+    element: componentMap["/task/edit"],
+  },
+];

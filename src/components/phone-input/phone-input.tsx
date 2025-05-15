@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import "./phone-input.scss";
-import usaFlag from "src/assets/flags/usa.svg";
-//import dropDown from "src/assets/icons/DropDownIcon-xs.svg";
-import DropDown from "src/assets/icons/DropDownIcon-xs.svg";
+import usaFlag from "../../assets/flags/usa.svg";
+import DropDown from "../../assets/icons/DropDownIcon-xs.svg";
 interface PhoneInputProps {
   size?: "small" | "medium" | "large";
   placeholder?: string;

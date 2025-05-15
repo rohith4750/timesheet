@@ -21,7 +21,7 @@
 
     .layout-section {
         padding: var(--spacing-space-24); // 20px converted to rem
-        background-color: #e8effb;
+
         flex: 1; // Ensures content takes available space
         height: calc(100vh - 3.75rem); // 60px converted to rem
     }

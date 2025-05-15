@@ -39,7 +39,7 @@ export function convertBracketNotationToObject(
 }
 
 export const getIcon = (icon: any) => {
-  return require(`src/assets/${icon}`);
+  return require(`../assets/images/${icon}`);
 };
 
 export const deepMerge = (target: any, source: any): any => {

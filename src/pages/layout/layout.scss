@@ -1,52 +1,53 @@
 .layout-wrapper {
-    display: flex;
+  display: flex;
 
-    &>section {
-        overflow-y: auto;
-        height: 100vh;
+  & > section {
+    overflow-y: auto;
+    height: 100vh;
 
-        &:first-child {
-            // width: 20%;
-            min-width: 12.5rem; // 200px converted to rem
-            // margin-right: 20px;
-        }
-
-        &:last-child {
-            width: 100%;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-        }
+    &:first-child {
+      // width: 20%;
+      min-width: 12.5rem; // 200px converted to rem
+      // margin-right: 20px;
     }
 
-    .layout-section {
-        padding: var(--spacing-space-24); // 20px converted to rem
-
-        flex: 1; // Ensures content takes available space
-        height: calc(100vh - 3.75rem); // 60px converted to rem
+    &:last-child {
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
     }
+  }
+
+  .layout-section {
+    padding: var(--spacing-space-24); // 20px converted to rem
+
+    flex: 1; // Ensures content takes available space
+    height: calc(100vh - 3.75rem); // 60px converted to rem
+  }
 }
 
 footer {
-    background-color: var(--white-three);
-    padding: 0.625rem 1.25rem; // 10px 20px converted to rem
-    box-sizing: inherit;
-    font-size: 0.7rem;
-    color: var(--black);
-    z-index: 2;
-    position: sticky;
-    bottom: 0;
-    width: 100%;
+  background-color: var(--white-three);
+  padding: 0.625rem 1.25rem; // 10px 20px converted to rem
+  box-sizing: inherit;
+  font-size: 0.7rem;
+  color: var(--black);
+  z-index: 2;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  border-top: 1px solid black;
 }
 
 // Prevent scrolling for toolbar and footer
-.layout-wrapper>section:last-child {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+.layout-wrapper > section:last-child {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 
-    .layout-section {
-        flex: 1;
-        overflow-y: auto; // Ensures only content scrolls
-    }
+  .layout-section {
+    flex: 1;
+    overflow-y: auto; // Ensures only content scrolls
+  }
 }

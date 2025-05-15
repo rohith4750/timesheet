@@ -40,6 +40,7 @@ interface FormData {
 interface ReusableFormProps<T extends FormData = FormData> {
   fields: FormField[];
   onSubmit: (formData: T) => void;
+  onCancel?: () => void;
   config?: FormConfig;
   initialData?: T;
 }
@@ -47,6 +48,7 @@ interface ReusableFormProps<T extends FormData = FormData> {
 const ReusableForm = <T extends FormData = FormData>({
   fields,
   onSubmit,
+  onCancel,
   config,
   initialData,
 }: ReusableFormProps<T>) => {
@@ -270,21 +272,19 @@ const ReusableForm = <T extends FormData = FormData>({
               {renderField(field)}
             </div>
           ))}
-          <div className="form-buttons">
-            <Button
-              type="submit"
-              className={`submit-button ${config?.cssClass || ""}`}
-            
+          <div className="button-group">
+            <Button type="submit" onClick={handleSubmit}>
               {config?.submitButtonText || "Submit"}
-           ></Button>
-            {config?.showCancelButton && (
-              <button
+            </Button>
+            {(config?.showCancelButton || config?.cancelButtonText) && (
+              <Button
                 type="button"
-                className="cancel-button"
-                onClick={handleCancel}
+                variant="secondary"
+                onClick={onCancel || config?.onCancel}
+                size="small"
               >
                 {config?.cancelButtonText || "Cancel"}
-              </button>
+              </Button>
             )}
           </div>
         </form>

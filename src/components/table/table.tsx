@@ -37,6 +37,7 @@ interface TableComponentProps {
     filterKey?: string;
     filterOptions?: { value: string | number; label: string }[];
     filterObjKey?: string;
+    render?(item: any): React.ReactNode;
   }[];
   fetchData: (params: any) => Promise<any>;
   onEdit?: (item: any) => void;

@@ -50,7 +50,8 @@ const AddTask: React.FC = () => {
 
   const formConfig = {
     formTitle: "Add New Task",
-    submitButtonText: "Add Task",
+    submitButtonText: "Save",
+    cancelButtonText: "Cancel",
   };
 
   const handleSubmit = (formData: TaskFormData) => {
@@ -58,15 +59,15 @@ const AddTask: React.FC = () => {
     console.log("Submitting task:", formData);
 
     // Navigate back to task list after submission
-    navigate("/tasks");
+    navigate("/task");
   };
 
   return (
     <div className="add-task-container">
-      <h1>Add Task</h1>
       <ReusableForm
         fields={formFields}
         onSubmit={handleSubmit}
+        onCancel={() => navigate('/task')}
         config={formConfig}
       />
     </div>

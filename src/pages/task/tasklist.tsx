@@ -4,19 +4,18 @@ import TableComponent from "../../components/table/table";
 import { permissionAccess } from "../../hooks/permissionAccess";
 import "./tasklist.scss";
 import Button from "../../components/button/button";
-interface TaskData {
-  id?: string;
-  task: string;
-  task_description: string;
-  ut_status: string;
-  task_start_at: string;
-}
+import {
+  getTasks,
+  deleteTask,
+  TaskData as ApiTaskData,
+} from "../../api/taskApi";
+type TaskData = Omit<ApiTaskData, "id"> & { id?: string };
 
 interface FilterParams {
   filters?: Record<keyof TaskData, string>;
 }
 
-const TaskList: React.FC = () => {
+const TaskList = () => {
   const navigate = useNavigate();
 
   const columns = [
@@ -57,58 +56,55 @@ const TaskList: React.FC = () => {
   ];
 
   const fetchData = useCallback(async (params: FilterParams) => {
-    // TODO: Implement API call to fetch task data
-    // Mock data for demonstration
-    let filteredData: TaskData[] = [
-      {
-        task: "Sample Task 1",
-        task_description: "Description for task 1",
-        ut_status: "pending",
-        task_start_at: "2024-01-15",
-      },
-      {
-        task: "Sample Task 2",
-        task_description: "Description for task 2",
-        ut_status: "approved",
-        task_start_at: "2024-01-16",
-      },
-      {
-        task: "Sample Task 3",
-        task_description: "Description for task 3",
-        ut_status: "in_progress",
-        task_start_at: "2024-01-17",
-      },
-    ];
+    try {
+      const page = 1; // TODO: Implement pagination
+      const limit = 10;
+      const response = await getTasks(page, limit);
 
-    // Apply filters if they exist
-    if (params.filters) {
-      Object.entries(params.filters).forEach(([key, value]) => {
-        if (value && key in filteredData[0]) {
-          filteredData = filteredData.filter((item) => {
-            const itemValue = item[key as keyof TaskData];
-            if (typeof itemValue !== "string") return false;
-            if (key === "task_start_at") {
-              return itemValue.includes(value);
-            }
-            return itemValue.toLowerCase().includes(value.toLowerCase());
-          });
-        }
-      });
+      let filteredData = response.data;
+
+      // Apply filters if they exist
+      if (params.filters) {
+        Object.entries(params.filters).forEach(([key, value]) => {
+          if (value && key in (filteredData[0] || {})) {
+            filteredData = filteredData.filter((item) => {
+              const itemValue = item[key as keyof TaskData];
+              if (typeof itemValue !== "string") return false;
+              if (key === "task_start_at") {
+                return itemValue.includes(value);
+              }
+              return itemValue.toLowerCase().includes(value.toLowerCase());
+            });
+          }
+        });
+      }
+
+      return {
+        data: filteredData,
+        total: response.total,
+      };
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      return {
+        data: [],
+        total: 0,
+      };
     }
-
-    return {
-      data: filteredData,
-      total: filteredData.length,
-    };
   }, []);
 
   const handleEdit = (item: TaskData) => {
     navigate(`/task/edit/${item.id}`);
   };
 
-  const handleDelete = async (item: TaskData) => {
-    // TODO: Implement delete API call
-    return { message: "Task deleted successfully" };
+  const handleDelete = async (item: TaskData): Promise<{ message: string }> => {
+    try {
+      if (!item.id) throw new Error("Task ID is required");
+      await deleteTask(Number(item.id));
+      return { message: "Task deleted successfully" };
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      throw new Error("Failed to delete task");
+    }
   };
 
   return (

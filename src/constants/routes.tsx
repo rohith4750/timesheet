@@ -1,7 +1,7 @@
 import React from "react";
 import HomePage from "../pages/home-page/home-page";
 import { MenuItem, menuItems } from "./menu";
-import TaskList from "../pages/task/tasklist";
+import TaskList from "../pages/task/tasklist"
 import AddTask from "../pages/task/add-task/add-task";
 import EditTask from "../pages/task/edit-task/edit-task";
 

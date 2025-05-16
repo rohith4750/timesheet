@@ -1,44 +1,152 @@
-import React, { useState } from 'react';
-import { useAuth } from '../../services/auth';
-import './profile.scss';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../../services/auth";
+import {
+  checkIsSuperAdmin,
+  fetchUserProfile,
+  updateSuperAdminProfile,
+  updateUserProfile,
+  changePassword,
+} from "../../api/profileApi";
+import InputField from "../../components/input-component/input-component";
+import { profileFormConfig, passwordFormConfig } from "./profile-config";
+import "./profile.scss";
 
 interface ProfileFormData {
   firstName: string;
   lastName: string;
   email: string;
   phoneNumber: string;
-  streetAddress: string;
-  city: string;
-  state: string;
-  zipCode: string;
+}
+
+interface PasswordFormData {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 const Profile: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const [formData, setFormData] = useState<ProfileFormData>({
-    firstName: '',
-    lastName: '',
-    email: user?.username || '',
-    phoneNumber: '',
-    streetAddress: '',
-    city: '',
-    state: '',
-    zipCode: ''
+    firstName: "",
+    lastName: "",
+    email: user?.username || "",
+    phoneNumber: "",
   });
 
+  const [passwordData, setPasswordData] = useState<PasswordFormData>({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  useEffect(() => {
+    const initializeProfile = async () => {
+      try {
+        const [adminStatus, userProfile] = await Promise.all([
+          checkIsSuperAdmin(),
+          fetchUserProfile(),
+        ]);
+
+        setIsSuperAdmin(adminStatus);
+
+        // Split the user_name into first and last name
+        const [firstName = "", lastName = ""] =
+          userProfile.user_name.split(" ");
+
+        setFormData({
+          firstName,
+          lastName,
+          email: userProfile.email,
+          phoneNumber: userProfile.user_phone,
+        });
+
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to load profile data");
+        setLoading(false);
+      }
+    };
+
+    initializeProfile();
+  }, []);
+
   const handleInputChange = (field: keyof ProfileFormData, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implement profile update logic
-    console.log('Profile data:', formData);
+  const handlePasswordChange = (
+    field: keyof PasswordFormData,
+    value: string
+  ) => {
+    setPasswordData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
+
+  const handleProfileSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const userProfile = await fetchUserProfile();
+      const userData = {
+        user_sno: userProfile.user_sno,
+        user_name: `${formData.firstName} ${formData.lastName}`.trim(),
+        user_phone: formData.phoneNumber,
+        ...(isSuperAdmin && { user_id: userProfile.user_id }),
+      };
+
+      if (isSuperAdmin) {
+        await updateSuperAdminProfile(userData as any);
+      } else {
+        await updateUserProfile(userData);
+      }
+
+      setError("Profile updated successfully");
+    } catch (err) {
+      setError("Failed to update profile");
+    }
+  };
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setError("New passwords do not match");
+      return;
+    }
+
+    try {
+      await changePassword({
+        current_password: passwordData.currentPassword,
+        new_password: passwordData.newPassword,
+        confirm_newpassword: passwordData.confirmPassword,
+      });
+
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      setError("Password changed successfully");
+    } catch (err) {
+      setError("Failed to change password");
+    }
+  };
+
+  if (loading) {
+    return <div className="profile-page">Loading...</div>;
+  }
 
   return (
     <div className="profile-page">
@@ -48,8 +156,8 @@ const Profile: React.FC = () => {
             {/* Profile image placeholder */}
           </div>
           <div className="profile-details">
-            <h2>{user?.username}</h2>
-            <span className="role">System Admin</span>
+            <h2>{formData.firstName} {formData.lastName}</h2>
+            <span className="role">{isSuperAdmin ? 'Super Admin' : 'User'}</span>
           </div>
         </div>
       </div>
@@ -69,113 +177,42 @@ const Profile: React.FC = () => {
         </button>
       </div>
 
+      {error && <div className="error-message">{error}</div>}
+
       <div className="profile-content">
         {activeTab === 'overview' ? (
-          <form onSubmit={handleSubmit} className="profile-form">
+          <form onSubmit={handleProfileSubmit} className="profile-form">
             <div className="form-row">
-              <div className="form-group">
-                <label>First Name*</label>
-                <input
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) => handleInputChange('firstName', e.target.value)}
-                  placeholder="Enter your first name"
-                />
-              </div>
-              <div className="form-group">
-                <label>Last Name*</label>
-                <input
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
-                  placeholder="Enter your last name"
-                />
-              </div>
+              {profileFormConfig.map((field, index) => (
+                <div className="form-group" key={field.name}>
+                  <InputField
+                    type={field.type}
+                    label={field.label}
+                    value={formData[field.name]}
+                    onChange={(value) => handleInputChange(field.name, value as string)}
+                    placeholder={field.placeholder}
+                    disabled={field.disabled}
+                  />
+                </div>
+              ))}
             </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>ID Number*</label>
-                <input
-                  type="text"
-                  value={formData.phoneNumber}
-                  onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-                  placeholder="Enter your ID number"
-                />
-              </div>
-              <div className="form-group">
-                <label>Email Address*</label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  placeholder="Enter your email"
-                  disabled
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>Street Address*</label>
-                <input
-                  type="text"
-                  value={formData.streetAddress}
-                  onChange={(e) => handleInputChange('streetAddress', e.target.value)}
-                  placeholder="Enter your street address"
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>City*</label>
-                <input
-                  type="text"
-                  value={formData.city}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
-                  placeholder="Enter your city"
-                />
-              </div>
-              <div className="form-group">
-                <label>State*</label>
-                <input
-                  type="text"
-                  value={formData.state}
-                  onChange={(e) => handleInputChange('state', e.target.value)}
-                  placeholder="Enter your state"
-                />
-              </div>
-              <div className="form-group">
-                <label>Zip Code*</label>
-                <input
-                  type="text"
-                  value={formData.zipCode}
-                  onChange={(e) => handleInputChange('zipCode', e.target.value)}
-                  placeholder="Enter your zip code"
-                />
-              </div>
-            </div>
-
             <div className="form-actions">
-              <button type="submit" className="save-button">Save</button>
-              <button type="button" className="back-button">Back</button>
+              <button type="submit" className="save-button">Save Changes</button>
             </div>
           </form>
         ) : (
-          <form className="change-password-form">
-            <div className="form-group">
-              <label>Current Password*</label>
-              <input type="password" placeholder="Enter current password" />
-            </div>
-            <div className="form-group">
-              <label>New Password*</label>
-              <input type="password" placeholder="Enter new password" />
-            </div>
-            <div className="form-group">
-              <label>Confirm Password*</label>
-              <input type="password" placeholder="Confirm new password" />
-            </div>
+          <form onSubmit={handlePasswordSubmit} className="change-password-form">
+            {passwordFormConfig.map((field) => (
+              <div className="form-group" key={field.name}>
+                <InputField
+                  type={field.type}
+                  label={field.label}
+                  value={passwordData[field.name]}
+                  onChange={(value) => handlePasswordChange(field.name, value as string)}
+                  placeholder={field.placeholder}
+                />
+              </div>
+            ))}
             <div className="form-actions">
               <button type="submit" className="change-password-button">Change Password</button>
             </div>

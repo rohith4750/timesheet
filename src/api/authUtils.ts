@@ -25,10 +25,11 @@ export const removeAuthToken = (): void => {
   localStorage.removeItem(TOKEN_KEY);
 };
 
-// Check if token is expired
+// Check if token is expired or will expire soon (within 5 seconds)
 export const isTokenExpired = (token: AuthToken): boolean => {
   if (!token.expiresIn) return true;
-  return Date.now() >= token.expiresIn;
+  // Add 5 seconds buffer to prevent edge cases
+  return Date.now() + 5000 >= token.expiresIn;
 };
 
 // Get authentication header

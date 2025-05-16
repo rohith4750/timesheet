@@ -53,7 +53,7 @@ const Toolbar: React.FC<ToolbarProps> = () => {
           {/* Dropdown Menu */}
           {isDropdownOpen && (
             <div className="dropdown-menu">
-              <a className="dropdown-item" onClick={() => navigate("/Profile")}>
+              <a className="dropdown-item" onClick={() => navigate("/profile")}>
                 Profile
               </a>
               {/* {!isTemporaryPassword && (

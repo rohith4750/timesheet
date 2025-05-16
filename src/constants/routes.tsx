@@ -50,6 +50,6 @@ export const routes: RouteConfig[] = [
   },
   {
     path: "/profile",
-    element: componentMap["/project/edit"],
+    element: componentMap["/profile"],
   },
 ];

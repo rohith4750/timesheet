@@ -1,0 +1,156 @@
+.profile-page {
+  padding: 24px;
+  background-color: #f5f6f8;
+  min-height: calc(100vh - 64px);
+
+  .profile-header {
+    background: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+
+    .profile-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .profile-image {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background-color: #e0e0e0;
+      }
+
+      .profile-details {
+        h2 {
+          margin: 0;
+          font-size: 20px;
+          color: #333;
+        }
+
+        .role {
+          color: #666;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .profile-tabs {
+    background: #fff;
+    padding: 0 24px;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    gap: 32px;
+
+    .tab {
+      padding: 16px 0;
+      border: none;
+      background: none;
+      font-size: 16px;
+      color: #666;
+      cursor: pointer;
+      position: relative;
+
+      &.active {
+        color: #1a73e8;
+        font-weight: 500;
+
+        &:after {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background-color: #1a73e8;
+        }
+      }
+    }
+  }
+
+  .profile-content {
+    background: #fff;
+    padding: 24px;
+    border-radius: 0 0 8px 8px;
+
+    .profile-form,
+    .change-password-form {
+      .form-row {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 24px;
+
+        .form-group {
+          flex: 1;
+        }
+      }
+
+      .form-group {
+        margin-bottom: 24px;
+
+        label {
+          display: block;
+          margin-bottom: 8px;
+          color: #333;
+          font-size: 14px;
+        }
+
+        input {
+          width: 100%;
+          padding: 8px 12px;
+          border: 1px solid #e0e0e0;
+          border-radius: 4px;
+          font-size: 14px;
+
+          &:disabled {
+            background-color: #f5f6f8;
+            cursor: not-allowed;
+          }
+
+          &:focus {
+            outline: none;
+            border-color: #1a73e8;
+          }
+        }
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: flex-end;
+        margin-top: 32px;
+
+        button {
+          padding: 8px 24px;
+          border-radius: 4px;
+          font-size: 14px;
+          cursor: pointer;
+          transition: background-color 0.2s;
+
+          &.save-button,
+          &.change-password-button {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+
+            &:hover {
+              background-color: #1557b0;
+            }
+          }
+
+          &.back-button {
+            background-color: transparent;
+            border: 1px solid #e0e0e0;
+            color: #666;
+
+            &:hover {
+              background-color: #f5f6f8;
+            }
+          }
+        }
+      }
+    }
+  }
+}

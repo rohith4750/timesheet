@@ -1,20 +1,16 @@
 .toolbar {
+  background: #fff;
+  padding: 8px 24px;
+  border-bottom: 1px solid #e0e0e0;
   display: flex;
-  justify-content: end;
-  // align-items: center;
-  padding: 10px 20px;
-  background-color: var(--white-three);
-  height: 2.75rem;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  border-bottom: 1px solid black;
+  justify-content: flex-end;
+  align-items: center;
 
   /* Left Section */
 
   /* Center Section */
   .toolbar-heading {
-    flex: 1; // Takes the space between left and right sections
+    flex: 1;
     text-align: center;
     font-size: 24px;
     font-weight: 400;

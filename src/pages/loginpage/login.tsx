@@ -6,7 +6,7 @@ import Button from "../../components/button/button";
 import { loginUser } from "../../api/loginApi";
 import "./login.scss";
 import logo from "../../assets/icons/pycube-logo.svg";
-import design from "../../assets/icons/login-right.svg";
+import design from "../../assets/icons/timesheet-login.svg";
 interface LoginFormData {
   user_email: string;
   password: string;

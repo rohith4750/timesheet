@@ -83,7 +83,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setAlerts([
         { type: "success", text: "Successfully logged in!", duration: 3000 },
       ]);
-      navigate("/home");
+      // Add a small delay to ensure toast is visible before navigation
+      setTimeout(() => {
+        navigate("/home-page");
+      }, 10000000);
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(error.message);

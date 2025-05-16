@@ -1,0 +1,278 @@
+.c1-card {
+  margin: 8px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px 20px 15px;
+
+  .title {
+    display: flex;
+
+    img {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      margin-top: 3px;
+    }
+  }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+    color: var(--main-blue);
+  }
+
+  .content {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  p {
+    font-size: 1.5rem;
+    font-weight: 900;
+  }
+
+  span {
+    color: var(--main-blue);
+    font-size: 0.9rem;
+  }
+}
+
+.c2-card {
+  // margin: 0px 15px 0px 0px;
+  border-radius: 8px;
+  background: var(--card-surface-primary, #fff);
+  /* DropShadow1 */
+  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &:last-child {
+    margin-right: 0px;
+  }
+
+  .title {
+    display: flex;
+
+    img {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      margin-top: 3px;
+    }
+  }
+
+  h3 {
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin: 0;
+    color: var(--main-blue);
+  }
+
+  .content {
+    // margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  p {
+    font-size: 1.5rem;
+    font-weight: 900;
+  }
+
+  .graph {
+    display: flex;
+    justify-content: flex-start;
+
+    div {
+      margin-right: 5px;
+      font-size: 0.7rem;
+      margin-right: 5px;
+      margin-left: 5px;
+
+      &:first-child {
+        margin-left: 0px;
+      }
+    }
+
+    .high {
+      color: var(--green-five);
+    }
+
+    .low {
+      color: var(--red-two);
+    }
+  }
+
+  .stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+
+    & > div {
+      margin-right: 5px;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-size: 0.8rem;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+
+    .st-red {
+      background-color: #dc3545;
+      color: var(--white);
+    }
+
+    .st-yellow {
+      background-color: #ffcd39;
+    }
+
+    .st-blue {
+      background-color: #0c64e6;
+      color: var(--white);
+    }
+  }
+}
+
+.c3-card {
+  // margin: 0px 15px 0px 0px;
+  border-radius: 8px;
+  background: var(--card-surface-primary, #fff);
+
+  /* DropShadow1 */
+  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.15);
+  width: 190px;
+  height: 119px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &:last-child {
+    margin-right: 0px;
+  }
+
+  .title {
+    display: flex;
+
+    img {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      margin-top: 3px;
+    }
+  }
+
+  h3 {
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin: 0;
+    color: var(--main-blue);
+  }
+
+  .content {
+    // margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  span {
+    color: var(--main-blue);
+    font-size: 0.9rem;
+  }
+
+  p {
+    font-size: 1.5rem;
+    font-weight: 900;
+  }
+
+  .stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+
+    & > div {
+      margin-right: 5px;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-size: 0.8rem;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+
+    .st-red {
+      background-color: #dc3545;
+      color: var(--white);
+    }
+
+    .st-yellow {
+      background-color: #ffcd39;
+    }
+
+    .st-blue {
+      background-color: #0c64e6;
+      color: var(--white);
+    }
+  }
+}
+
+.c4-card {
+  // margin: 0px 15px 0px 0px;
+  border-radius: 8px;
+  background: var(--card-surface-primary, #fff);
+  /* DropShadow1 */
+  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &:last-child {
+    margin-right: 0px;
+  }
+
+  .title {
+    display: flex;
+
+    img {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      margin-top: 3px;
+    }
+  }
+
+  h3 {
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin: 0;
+    color: var(--main-blue);
+  }
+
+  .content {
+    // margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  span {
+    color: var(--main-blue);
+    font-size: 0.9rem;
+  }
+
+  p {
+    font-size: 1.5rem;
+    font-weight: 900;
+  }
+}

@@ -1,0 +1,47 @@
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="800" fill="#0A192F"/>
+  
+  <!-- Main Title -->
+  <text x="400" y="150" font-family="Arial" font-size="48" fill="white" text-anchor="middle" font-weight="bold">TIMESHEET LOGIN</text>
+  
+  <!-- Document Icon with Clock -->
+  <g transform="translate(200,250)">
+    <!-- Document Base -->
+    <path d="M 0,0 L 250,0 L 250,300 L 0,300 Z" fill="none" stroke="white" stroke-width="4"/>
+    
+    <!-- User Icon -->
+    <circle cx="50" cy="50" r="20" fill="none" stroke="white" stroke-width="4"/>
+    <line x1="30" y1="80" x2="70" y2="80" stroke="white" stroke-width="4"/>
+    
+    <!-- Lines representing text -->
+    <line x1="100" y1="50" x2="200" y2="50" stroke="white" stroke-width="4"/>
+    
+    <!-- Grid Lines -->
+    <g transform="translate(30,120)">
+      <rect width="190" height="150" fill="none" stroke="white" stroke-width="2"/>
+      <!-- Vertical lines -->
+      <line x1="63" y1="0" x2="63" y2="150" stroke="white" stroke-width="2"/>
+      <line x1="126" y1="0" x2="126" y2="150" stroke="white" stroke-width="2"/>
+      <!-- Horizontal lines -->
+      <line x1="0" y1="50" x2="190" y2="50" stroke="white" stroke-width="2"/>
+      <line x1="0" y1="100" x2="190" y2="100" stroke="white" stroke-width="2"/>
+    </g>
+  </g>
+  
+  <!-- Clock Icon -->
+  <g transform="translate(500,350)">
+    <circle cx="0" cy="0" r="60" fill="none" stroke="white" stroke-width="4"/>
+    <!-- Clock hands -->
+    <line x1="0" y1="0" x2="0" y2="-35" stroke="white" stroke-width="4"/>
+    <line x1="0" y1="0" x2="25" y2="0" stroke="white" stroke-width="4"/>
+    <!-- Clock center dot -->
+    <circle cx="0" cy="0" r="5" fill="white"/>
+  </g>
+  
+  <!-- Gear Icon -->
+  <g transform="translate(500,350)">
+    <path d="M40,-20 L45,-5 L60,-10 L65,5 L50,15 L55,30 L35,35 L25,20 L5,25 L-5,10 L5,-5 L0,-20 L20,-25 Z" 
+          fill="none" stroke="white" stroke-width="2" transform="rotate(45)"/>
+  </g>
+</svg>

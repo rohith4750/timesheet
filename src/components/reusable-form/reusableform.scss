@@ -135,7 +135,6 @@
     flex-direction: column;
     gap: 24px;
 
-
     .section-title {
       font-size: 18px;
       font-weight: 600;
@@ -409,5 +408,26 @@
     color: var(--main-blue);
     text-decoration: underline;
     cursor: pointer;
+  }
+}
+
+.input-field {
+  font-family: "Poppins", sans-serif;
+  &::placeholder {
+    margin-left: 10px !important;
+  }
+}
+
+.select-wrapper select {
+  font-family: "Poppins", sans-serif;
+  &::placeholder {
+    margin-left: 40px !important;
+  }
+}
+
+.input-wrapper input {
+  font-family: "Poppins", sans-serif;
+  &::placeholder {
+    margin-left: 10px !important;
   }
 }

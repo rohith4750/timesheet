@@ -8,6 +8,9 @@ import AddProject from "../pages/project/add-project/add-project";
 import EditProject from "../pages/project/edit-project/edit-project";
 import ProjectList from "../pages/project/projectlist/projectList";
 import Profile from "../pages/profile/profile";
+import AddUser from "../pages/users/add-user/add-user";
+import EditUser from "../pages/users/edit-user/edit-user";
+import UserList from "../pages/users/userlist";
 export interface RouteConfig extends Omit<MenuItem, "icon" | "label"> {
   element: React.ReactNode;
   children?: RouteConfig[];
@@ -17,10 +20,13 @@ const componentMap: Record<string, React.ReactNode> = {
   "/home-page": <HomePage />,
   "/task": <TaskList />,
   "/project": <ProjectList />,
+  "/user": <UserList />,
   "/task/add": <AddTask />,
   "/task/edit": <EditTask />,
   "/project/add": <AddProject />,
   "/project/edit": <EditProject />,
+  "/user/add": <AddUser />,
+  "/user/edit": <EditUser />,
   "/profile": <Profile />,
 };
 
@@ -39,6 +45,14 @@ export const routes: RouteConfig[] = [
   {
     path: "/task/edit",
     element: componentMap["/task/edit"],
+  },
+  {
+    path: "/user/add",
+    element: componentMap["/user/add"],
+  },
+  {
+    path: "/user/edit",
+    element: componentMap["/user/edit"],
   },
   {
     path: "/project/add",

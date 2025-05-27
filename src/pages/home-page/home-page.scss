@@ -1,31 +1,35 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
+
 .analytics-dashboard {
-  padding: 20px;
-}
+  font-family: "Poppins", sans-serif;
+  padding: 24px;
 
-.dashboard-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px; // equivalent to spacing={3} in MUI
-  margin-top: 16px;
-}
-
-.dashboard-grid-item {
-  flex-grow: 1;
-  min-width: 0; // prevents flex items from overflowing
-
-  &--large {
-    flex-basis: calc(66.666% - 12px); // equivalent to md={8}
+  .MuiTypography-h4 {
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    margin-bottom: 32px;
+    color: #1a1a1a;
   }
 
-  &--small {
-    flex-basis: calc(33.333% - 12px); // equivalent to md={4}
-  }
+  .dashboard-grid {
+    display: grid;
+    grid-template-rows: repeat(1, 1fr);
+    gap: 24px;
+    margin-top: 24px;
 
-  @media (max-width: 900px) {
-    // equivalent to MUI's md breakpoint
-    &--large,
-    &--small {
-      flex-basis: 100%; // equivalent to xs={12}
+    .dashboard-grid-item {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      &--large {
+        grid-column: span 8;
+      }
+
+      &--small {
+        grid-column: span 4;
+      }
     }
   }
 }

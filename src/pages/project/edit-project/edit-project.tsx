@@ -17,7 +17,7 @@ const EditProject: React.FC = () => {
 
   const formFields: FormField[] = [
     {
-      label: "Task Name",
+      label: "Project Name",
       type: "text",
       name: "task",
       required: true,
@@ -25,7 +25,7 @@ const EditProject: React.FC = () => {
       placeholder: "Enter task name",
     },
     {
-      label: "Task Description",
+      label: "Project Description",
       type: "textarea",
       name: "task_description",
       required: true,

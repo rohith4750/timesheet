@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { useState, useEffect, useCallback, useRef } from "react";
-import './table.scss'
+import "./table.scss";
 import editIcon from "../../assets/images/save-icon.svg";
 import settingsIcon from "../../assets/images/settings.svg";
 import plus from "../../assets/icons/plus.svg";
@@ -839,54 +839,56 @@ TableComponentProps) {
             onClose={() => setIsDialogOpen(false)}
           />
         </div>
-      </div>
-      <div className="paginator">
-        <div className="paginator-controls">
-          <button
-            className="btn"
-            onClick={() => handlePageChange(1)}
-            disabled={currentPage === 1}
-          >
-            <div className="previous">
-              <img src={backward} alt="First Page" />
-              <img src={backward} alt="First Page" />
-            </div>
-          </button>
-          <button
-            className="btn-nav"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-
-          {visiblePages.map((page) => (
+        <div className="paginator">
+          <div className="paginator-controls">
             <button
-              key={page}
-              onClick={() => handlePageChange(page)}
-              className={`page-number ${page === currentPage ? "active" : ""}`}
+              className="btn"
+              onClick={() => handlePageChange(1)}
+              disabled={currentPage === 1}
             >
-              {page}
+              <div className="previous">
+                <img src={backward} alt="First Page" />
+                <img src={backward} alt="First Page" />
+              </div>
             </button>
-          ))}
+            <button
+              className="btn-nav"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
 
-          <button
-            className="btn-nav"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-          <button
-            className="btn"
-            onClick={() => handlePageChange(totalPages)}
-            disabled={currentPage === totalPages}
-          >
-            <div className="previous">
-              <img src={forward} alt="Last Page" />
-              <img src={forward} alt="Last Page" />
-            </div>
-          </button>
+            {visiblePages.map((page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`page-number ${
+                  page === currentPage ? "active" : ""
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              className="btn-nav"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+            <button
+              className="btn"
+              onClick={() => handlePageChange(totalPages)}
+              disabled={currentPage === totalPages}
+            >
+              <div className="previous">
+                <img src={forward} alt="Last Page" />
+                <img src={forward} alt="Last Page" />
+              </div>
+            </button>
+          </div>
         </div>
       </div>
 

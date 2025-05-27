@@ -17,7 +17,7 @@ const AddProject: React.FC = () => {
 
   const formFields = [
     {
-      label: "Task Name",
+      label: "Project Name",
       type: "text",
       name: "task",
       required: true,
@@ -51,7 +51,7 @@ const AddProject: React.FC = () => {
   ];
 
   const formConfig = {
-    formTitle: "Add New Task",
+    formTitle: "Add New Project",
     submitButtonText: "Save",
     cancelButtonText: "Cancel",
   };

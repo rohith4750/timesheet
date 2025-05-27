@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Typography } from "@mui/material";
 import { getTasks, TaskData } from "../../api/taskApi";
 import { BarChart, PieChart } from "../../components/analytics";
 import Card from "../../components/card/card";
@@ -47,10 +46,8 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="analytics-dashboard">
-      <Typography variant="h4" gutterBottom>
-        Task Analytics Dashboard
-      </Typography>
-      
+      <h2 className="dashboard-title">Analytics Dashboard</h2>
+
       <div className="stats-cards">
         <div className="stats-card-item">
           <Card
@@ -77,7 +74,6 @@ const HomePage: React.FC = () => {
           />
         </div>
       </div>
-
       <div className="dashboard-grid">
         <div className="dashboard-grid-item dashboard-grid-item--large">
           <BarChart

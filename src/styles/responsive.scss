@@ -1,0 +1,128 @@
+// Breakpoints
+$breakpoints: (
+  'sm': 576px,   // Small devices
+  'md': 768px,   // Medium devices
+  'lg': 992px,   // Large devices
+  'xl': 1200px,  // Extra large devices
+  'xxl': 1400px  // Extra extra large devices
+);
+
+// Media query mixins
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: map-get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @warn "No breakpoint found for `#{$breakpoint}`";
+  }
+}
+
+// Utility classes for responsive spacing
+.responsive-padding {
+  padding: 1rem;
+  
+  @include respond-to('md') {
+    padding: 1.5rem;
+  }
+  
+  @include respond-to('lg') {
+    padding: 2rem;
+  }
+}
+
+.responsive-margin {
+  margin: 1rem;
+  
+  @include respond-to('md') {
+    margin: 1.5rem;
+  }
+  
+  @include respond-to('lg') {
+    margin: 2rem;
+  }
+}
+
+// Responsive container
+.responsive-container {
+  width: 100%;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  margin-right: auto;
+  margin-left: auto;
+
+  @include respond-to('sm') {
+    max-width: 540px;
+  }
+
+  @include respond-to('md') {
+    max-width: 720px;
+  }
+
+  @include respond-to('lg') {
+    max-width: 960px;
+  }
+
+  @include respond-to('xl') {
+    max-width: 1140px;
+  }
+
+  @include respond-to('xxl') {
+    max-width: 1320px;
+  }
+}
+
+// Responsive grid system
+.responsive-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, 1fr);
+
+  @include respond-to('md') {
+    grid-template-columns: repeat(8, 1fr);
+  }
+
+  @include respond-to('lg') {
+    grid-template-columns: repeat(12, 1fr);
+  }
+}
+
+// Responsive typography
+.responsive-text {
+  font-size: 1rem;
+
+  @include respond-to('md') {
+    font-size: 1.125rem;
+  }
+
+  @include respond-to('lg') {
+    font-size: 1.25rem;
+  }
+}
+
+// Responsive flexbox utilities
+.responsive-flex {
+  display: flex;
+  flex-direction: column;
+
+  @include respond-to('md') {
+    flex-direction: row;
+  }
+}
+
+// Hide/Show elements based on breakpoints
+.hide-on-mobile {
+  display: none;
+  
+  @include respond-to('md') {
+    display: block;
+  }
+}
+
+.show-on-mobile {
+  display: block;
+  
+  @include respond-to('md') {
+    display: none;
+  }
+}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getTasks, TaskData } from "../../api/taskApi";
+//import { BarChart, PieChart } from "../../components/analytics";
 import { BarChart, PieChart } from "../../components/analytics";
 import Card from "../../components/card/card";
 import "./home-page.scss";

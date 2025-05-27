@@ -77,3 +77,4 @@ export const BarChart: React.FC<BarChartProps> = ({
     </Paper>
   );
 };
+export default BarChart;

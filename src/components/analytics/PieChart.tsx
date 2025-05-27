@@ -6,7 +6,7 @@ import { ApexOptions } from 'apexcharts';
 
 const defaultColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-export const PieChart: React.FC<PieChartProps> = ({
+const PieChart: React.FC<PieChartProps> = ({
   title,
   data,
   height = 350,
@@ -58,3 +58,5 @@ export const PieChart: React.FC<PieChartProps> = ({
     </Paper>
   );
 };
+
+export default PieChart;

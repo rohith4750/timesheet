@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import ReusableForm from "../../../components/reusable-form/reusableform";
+import { useToast } from "../../../components/toast/ToastContext";
 import "./edit-user.scss";
 
 interface TaskFormData {
@@ -13,6 +14,7 @@ interface TaskFormData {
 
 const EditUser: React.FC = () => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const formFields = [
     {
@@ -51,12 +53,28 @@ const EditUser: React.FC = () => {
     cancelButtonText: "Cancel",
   };
 
-  const handleSubmit = (formData: TaskFormData) => {
-    // TODO: Implement API call to save task
-    console.log("Submitting task:", formData);
+  const handleSubmit = async (formData: TaskFormData) => {
+    try {
+      // TODO: Implement API call to update user
+      console.log("Updating user:", formData);
 
-    // Navigate back to task list after submission
-    navigate("/task");
+      showToast({
+        type: "success",
+        message: "User updated successfully!",
+        duration: 2000
+      });
+
+      setTimeout(() => {
+        navigate("/user");
+      }, 2000);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      showToast({
+        type: "error",
+        message: "Failed to update user. Please try again.",
+        duration: 5000
+      });
+    }
   };
 
   return (

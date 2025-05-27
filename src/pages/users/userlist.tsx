@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import TableComponent from "../../components/table/table";
 import { permissionAccess } from "../../hooks/permissionAccess";
 import Button from "../../components/button/button";
+import { useToast } from "../../components/toast/ToastContext";
 import {
   getUsers,
   deleteUser,
@@ -24,6 +25,7 @@ type AxiosError = {
 
 const UserList = () => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -109,13 +111,23 @@ const UserList = () => {
     try {
       if (!item.user_sno) throw new Error("User SNO is required");
       const response = await deleteUser(item.user_sno);
-      setRefreshTrigger((prev) => prev + 1); // Trigger refresh after deletion
+      setRefreshTrigger((prev) => prev + 1);
+      showToast({
+        type: "success",
+        message: "User deleted successfully",
+        duration: 2000
+      });
       return { message: response.message };
     } catch (error) {
       console.error("Error deleting user:", error);
       if ((error as AxiosError)?.response?.status === 401) {
         navigate("/login");
       }
+      showToast({
+        type: "error",
+        message: "Failed to delete user. Please try again.",
+        duration: 5000
+      });
       throw new Error("Failed to delete user");
     }
   };

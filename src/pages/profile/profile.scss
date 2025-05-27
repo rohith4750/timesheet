@@ -45,7 +45,7 @@
     gap: 32px;
 
     .tab {
-      padding: 16px 0;
+      padding: 10px 20px;
       border: none;
       background: none;
       font-size: 16px;
@@ -54,17 +54,19 @@
       position: relative;
 
       &.active {
-        color: #1a73e8;
+        color: var(--button-primary-hover, #343658);
         font-weight: 500;
 
         &:after {
-          content: '';
+          content: "";
           position: absolute;
           bottom: -1px;
           left: 0;
           right: 0;
-          height: 2px;
-          background-color: #1a73e8;
+          height: 3px;
+          border-radius: 5px 5px 0px 0px;
+          z-index: 1;
+          background-color: var(--button-primary-hover, #343658);
         }
       }
     }
@@ -98,11 +100,21 @@
         }
 
         input {
-          width: 100%;
-          padding: 8px 12px;
-          border: 1px solid #e0e0e0;
-          border-radius: 4px;
-          font-size: 14px;
+          // width: 100%;
+          // padding: 8px 12px;
+          // border: 1px solid #e0e0e0;
+          // border-radius: 4px;
+          // font-size: 14px;
+          height: var(--input-height-med, 44px);
+          padding: 8px var(--input-padding-horizontal, 12px);
+          font-size: var(--font-size-med);
+          background-color: var(-color-background-background-light);
+          font-size: var(--size-medium-font);
+          font-family: var(--font-family-open-sans);
+          border-radius: var(--input-border-radius, 8px);
+          border: 1px solid var(--input-border-active, #3a3a3a);
+          background: var(--input-default, #fff);
+          box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.15);
 
           &:disabled {
             background-color: #f5f6f8;
@@ -131,12 +143,25 @@
 
           &.save-button,
           &.change-password-button {
-            background-color: #1a73e8;
-            color: white;
-            border: none;
+            display: flex;
+            height: var(--button-height-med);
+            padding: var(--spacing-space-12) var(--spacing-space-28);
+            align-items: center;
+            gap: var(--button-gap-icon-text);
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-default);
+            font-weight: var(--font-weight-medium);
+            font-family: var(--font-family-base);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--color-neutral-text-300);
+            background: var(--button-primary-default);
+            color: var(--button-primary-color-default, #fff);
+            padding: var(--spacing-space-12, 12px) var(--spacing-space-28, 28px)
+              var(--spacing-space-12, 12px) var(--spacing-space-28, 28px);
 
             &:hover {
-              background-color: #1557b0;
+              background: var(--button-primary-hover, #343658);
             }
           }
 

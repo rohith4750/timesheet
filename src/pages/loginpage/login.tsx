@@ -4,6 +4,7 @@ import { useAuth } from "../../services/auth";
 import InputField from "../../components/input-component/input-component";
 import Button from "../../components/button/button";
 import { loginUser } from "../../api/loginApi";
+import { useToast } from "../../components/toast/ToastContext";
 import "./login.scss";
 import logo from "../../assets/icons/pycube-logo.svg";
 import design from "../../assets/icons/timesheet-login.svg";
@@ -41,6 +42,7 @@ const Login: React.FC = () => {
 
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,11 +50,21 @@ const Login: React.FC = () => {
     if (validateForm()) {
       try {
         await login(formData.user_email, formData.password);
-        navigate("/home-page");
-      } catch (error) {
-        setErrors({
-          user_email: (error as Error).message || "Login failed. Please try again.",
+        showToast({
+          type: "success",
+          message: "Login successful!",
+          duration: 2000
         });
+        setTimeout(() => {
+          navigate("/home-page");
+        }, 2000);
+      } catch (error) {
+          console.error("Login failed:", error);
+          showToast({
+            type: "error",
+            message: "Login failed. Please check your credentials.",
+            duration: 5000
+          });
       }
       
     }

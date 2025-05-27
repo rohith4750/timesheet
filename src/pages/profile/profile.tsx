@@ -144,9 +144,9 @@ const Profile: React.FC = () => {
   //   }
   // };
 
-  if (loading) {
-    return <div className="profile-page">Loading...</div>;
-  }
+  // if (loading) {
+  //   return <div className="profile-page">Loading...</div>;
+  // }
 
   return (
     <div className="profile-page">
@@ -202,7 +202,7 @@ const Profile: React.FC = () => {
             </div>
             <div className="form-actions">
               <button type="submit" className="save-button">
-                Save Changes
+                Save
               </button>
             </div>
           </form>

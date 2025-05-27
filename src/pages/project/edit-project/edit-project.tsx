@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ReusableForm from "../../../components/reusable-form/reusableform";
+import { useToast } from "../../../components/toast/ToastContext";
 import { FormField } from "../../../types/form";
 interface TaskData {
   task: string;
@@ -9,6 +11,8 @@ interface TaskData {
 }
 
 const EditProject: React.FC = () => {
+  const navigate = useNavigate();
+  const { showToast } = useToast();
   const [initialData, setInitialData] = useState<TaskData | null>(null);
 
   const formFields: FormField[] = [
@@ -70,10 +74,25 @@ const EditProject: React.FC = () => {
 
   const handleSubmit = async (formData: any) => {
     try {
-      // TODO: Implement API call to update task
+      // TODO: Implement API call to update project
       console.log("Form submitted:", formData);
+
+      showToast({
+        type: "success",
+        message: "Project updated successfully!",
+        duration: 2000
+      });
+
+      setTimeout(() => {
+        navigate("/task");
+      }, 2000);
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error("Error updating project:", error);
+      showToast({
+        type: "error",
+        message: "Failed to update project. Please try again.",
+        duration: 5000
+      });
     }
   };
 

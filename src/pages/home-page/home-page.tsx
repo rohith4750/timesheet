@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Typography } from "@mui/material";
 import { getTasks, TaskData } from "../../api/taskApi";
 import { BarChart, PieChart } from "../../components/analytics";
+import Card from "../../components/card/card";
 import "./home-page.scss";
 
 const HomePage: React.FC = () => {
@@ -15,18 +16,28 @@ const HomePage: React.FC = () => {
     values: [25, 30, 35, 10],
   });
 
+  const [dashboardStats, setDashboardStats] = useState({
+    totalTasks: 0,
+    totalProjects: 0,
+    totalUsers: 0,
+  });
+
   useEffect(() => {
-    const fetchTaskData = async () => {
+    const fetchDashboardData = async () => {
       try {
         const response = await getTasks(1, 100);
         // Process data for charts here
-        // This is a placeholder for actual data processing
+        setDashboardStats({
+          totalTasks: response.data.length || 0,
+          totalProjects: 15, // Replace with actual API call
+          totalUsers: 25, // Replace with actual API call
+        });
       } catch (error) {
-        console.error("Error fetching task data:", error);
+        console.error("Error fetching dashboard data:", error);
       }
     };
 
-    fetchTaskData();
+    fetchDashboardData();
   }, []);
 
   return (
@@ -34,6 +45,34 @@ const HomePage: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         Task Analytics Dashboard
       </Typography>
+      
+      <div className="stats-cards">
+        <div className="stats-card-item">
+          <Card
+            heading="Total Tasks"
+            value={dashboardStats.totalTasks}
+            info="Assigned tasks across all projects"
+            type="c2"
+          />
+        </div>
+        <div className="stats-card-item">
+          <Card
+            heading="Active Projects"
+            value={dashboardStats.totalProjects}
+            info="Currently running projects"
+            type="c2"
+          />
+        </div>
+        <div className="stats-card-item">
+          <Card
+            heading="Total Users"
+            value={dashboardStats.totalUsers}
+            info="Registered system users"
+            type="c2"
+          />
+        </div>
+      </div>
+
       <div className="dashboard-grid">
         <div className="dashboard-grid-item dashboard-grid-item--large">
           <BarChart

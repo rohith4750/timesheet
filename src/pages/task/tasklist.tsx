@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import TableComponent from "../../components/table/table";
 import { permissionAccess } from "../../hooks/permissionAccess";
+import { useToast } from "../../components/toast/ToastContext";
 import "./tasklist.scss";
 import Button from "../../components/button/button";
 import {
@@ -17,6 +18,7 @@ interface FilterParams {
 
 const TaskList = () => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const columns = [
     {
@@ -100,9 +102,19 @@ const TaskList = () => {
     try {
       if (!item.id) throw new Error("Task ID is required");
       await deleteTask(Number(item.id));
+      showToast({
+        type: "success",
+        message: "Task deleted successfully",
+        duration: 2000
+      });
       return { message: "Task deleted successfully" };
     } catch (error) {
       console.error("Error deleting task:", error);
+      showToast({
+        type: "error",
+        message: "Failed to delete task. Please try again.",
+        duration: 5000
+      });
       throw new Error("Failed to delete task");
     }
   };

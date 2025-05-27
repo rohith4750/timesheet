@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import ReusableForm from "../../../components/reusable-form/reusableform";
+import { useToast } from "../../../components/toast/ToastContext";
 import "./add-user.scss";
 
 interface TaskFormData {
@@ -13,6 +14,7 @@ interface TaskFormData {
 
 const AddUser: React.FC = () => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const formFields = [
     {
@@ -51,12 +53,28 @@ const AddUser: React.FC = () => {
     cancelButtonText: "Cancel",
   };
 
-  const handleSubmit = (formData: TaskFormData) => {
-    // TODO: Implement API call to save task
-    console.log("Submitting task:", formData);
+  const handleSubmit = async (formData: TaskFormData) => {
+    try {
+      // TODO: Implement API call to save user
+      console.log("Submitting user:", formData);
 
-    // Navigate back to task list after submission
-    navigate("/user");
+      showToast({
+        type: "success",
+        message: "User created successfully!",
+        duration: 2000
+      });
+
+      setTimeout(() => {
+        navigate("/user");
+      }, 2000);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      showToast({
+        type: "error",
+        message: "Failed to create user. Please try again.",
+        duration: 5000
+      });
+    }
   };
 
   return (

@@ -135,8 +135,7 @@
   font-size: 12px;
   outline: none;
   /* Remove default focus outline */
-  background: url("../../assets/icons/SearchIcon-xs.svg") no-repeat 10px
-    center;
+  background: url("../../assets/icons/SearchIcon-xs.svg") no-repeat 10px center;
   /* Replace with your icon path */
   background-size: 16px 15px;
   /* Size of the search icon */
@@ -162,8 +161,10 @@
   justify-content: space-between;
   padding: 12px;
 
+  border-radius: 10px 10px 10px 10px;
+
   & > div {
-    width: 50%;
+    width: 70%;
   }
 }
 
@@ -204,6 +205,7 @@
   // border: var(--border-width-thick-1) solid var(--table-border);
   background: var(--surface-secondary);
   border-radius: var(--border-radius-lg);
+  border: 1px solid var(--input-border-active, #3a3a3a);
   box-shadow: 0 var(--border-width-thick-2) var(--border-width-thick-4)
     rgba(0, 0, 0, 0.1);
   width: 100%;

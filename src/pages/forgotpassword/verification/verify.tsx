@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import InputField from "../../components/input-component/input-component";
-import Button from "../../components/button/button";
-import { forgotPassword } from "../../api/passwordApi";
-import "./forgotpassword.scss";
-import logo from "../../assets/icons/pycube-logo.svg";
+import { useNavigate, Link } from "react-router-dom";
+import InputField from "../../../components/input-component/input-component";
+import Button from "../../../components/button/button";
+import { forgotPassword } from "../../../api/passwordApi";
+import "./verify.scss";
+import logo from "../../../assets/icons/pycube-logo.svg";
 
 interface ForgotPasswordFormData {
-  email: string;
+  user_email: string;
 }
 
-const ForgotPassword: React.FC = () => {
+const Verification: React.FC = () => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
@@ -35,11 +35,13 @@ const ForgotPassword: React.FC = () => {
 
     if (validateEmail(email)) {
       try {
-        const response = await forgotPassword({ email });
+        const response = await forgotPassword({ user_email: email });
         if (response.success) {
-          setSuccess(response.message || "Reset instructions sent to your email");
+          setSuccess(
+            response.message || "Reset instructions sent to your email"
+          );
           setTimeout(() => {
-            navigate("/login");
+            navigate("/forgot-password/reset?email=" + encodeURIComponent(email));
           }, 3000);
         } else {
           setError(response.message || "Failed to process request");
@@ -73,11 +75,11 @@ const ForgotPassword: React.FC = () => {
           {success && <div className="success-message">{success}</div>}
 
           <Button type="submit" variant="primary" size="large" fullWidth>
-            Send Reset Instructions
+            Send Verification Code
           </Button>
 
           <div className="back-to-login">
-            <a href="/login">Back to Login</a>
+            <Link to="/login">Back to Login</Link>
           </div>
         </form>
       </div>
@@ -85,4 +87,4 @@ const ForgotPassword: React.FC = () => {
   );
 };
 
-export default ForgotPassword;
+export default Verification;

@@ -11,6 +11,9 @@ import Profile from "../pages/profile/profile";
 import AddUser from "../pages/users/add-user/add-user";
 import EditUser from "../pages/users/edit-user/edit-user";
 import UserList from "../pages/users/userlist";
+import Verification from "../pages/forgotpassword/verification/verify";
+import ResetPassword from "../pages/forgotpassword/reset-password/reset-password";
+
 export interface RouteConfig extends Omit<MenuItem, "icon" | "label"> {
   element: React.ReactNode;
   children?: RouteConfig[];
@@ -28,6 +31,8 @@ const componentMap: Record<string, React.ReactNode> = {
   "/user/add": <AddUser />,
   "/user/edit": <EditUser />,
   "/profile": <Profile />,
+  "/forgot-password/verification": <Verification />,
+  "/forgot-password/reset": <ResetPassword />,
 };
 
 export const routes: RouteConfig[] = [
@@ -65,5 +70,13 @@ export const routes: RouteConfig[] = [
   {
     path: "/profile",
     element: componentMap["/profile"],
+  },
+  {
+    path: "/forgot-password/verification",
+    element: componentMap["/forgot-password/verification"],
+  },
+  {
+    path: "/forgot-password/reset",
+    element: componentMap["/forgot-password/reset"],
   },
 ];

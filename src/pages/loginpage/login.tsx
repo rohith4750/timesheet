@@ -99,9 +99,8 @@ const Login: React.FC = () => {
               }
               error={errors.password}
             />
-
-            <div className="forgot-password">
-              <a href="/forgot-password">Forgot Password?</a>
+            <div className="forgot-password-link">
+              <a href="/forgot-password/verification">Forgot Password?</a>
             </div>
 
             <Button type="submit" variant="primary" size="large" fullWidth>

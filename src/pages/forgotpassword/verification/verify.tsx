@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import InputField from "../../../components/input-component/input-component";
 import Button from "../../../components/button/button";
 import { forgotPassword } from "../../../api/passwordApi";
+import { useToast } from "../../../components/toast/ToastContext";
 import "./verify.scss";
 import logo from "../../../assets/icons/pycube-logo.svg";
 
@@ -15,6 +16,7 @@ const Verification: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const validateEmail = (email: string): boolean => {
     if (!email) {
@@ -37,17 +39,27 @@ const Verification: React.FC = () => {
       try {
         const response = await forgotPassword({ user_email: email });
         if (response.success) {
-          setSuccess(
-            response.message || "Reset instructions sent to your email"
-          );
+          showToast({
+            type: "success",
+            message: response.message || "Reset instructions sent to your email",
+            duration: 3000
+          });
           setTimeout(() => {
             navigate("/forgot-password/reset?email=" + encodeURIComponent(email));
           }, 3000);
         } else {
-          setError(response.message || "Failed to process request");
+          showToast({
+            type: "error",
+            message: response.message || "Failed to process request",
+            duration: 5000
+          });
         }
       } catch (error) {
-        setError("An error occurred. Please try again.");
+        showToast({
+          type: "error",
+          message: "An error occurred. Please try again.",
+          duration: 5000
+        });
       }
     }
   };

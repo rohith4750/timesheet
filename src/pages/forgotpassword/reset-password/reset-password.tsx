@@ -3,116 +3,85 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import InputField from "../../../components/input-component/input-component";
 import Button from "../../../components/button/button";
 import { resetPassword, verifyCode } from "../../../api/passwordApi";
+import { useToast } from "../../../components/toast/ToastContext";
 import "./reset-password.scss";
 import logo from "../../../assets/icons/pycube-logo.svg";
 
 interface ResetPasswordFormData {
   user_email: string;
-  code: string;
-  newPassword: string;
-  confirmPassword: string;
-  isVerified: boolean;
-  token?: string;
+  user_otp: string;
+  new_password: string;
 }
 
 const ResetPassword: React.FC = () => {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email") || "";
-
   const [formData, setFormData] = useState<ResetPasswordFormData>({
     user_email: email,
-    code: "",
-    newPassword: "",
-    confirmPassword: "",
-    isVerified: false,
+    user_otp: "",
+    new_password: "",
   });
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
-  const validateCode = (): boolean => {
-    if (!formData.code) {
-      setError("Verification code is required");
-      return false;
-    }
+  const validateForm = (): boolean => {
     if (!formData.user_email) {
       setError("Email is required");
       return false;
     }
-    return true;
-  };
-
-  const validatePassword = (): boolean => {
-    if (!formData.newPassword) {
+    if (!formData.user_otp) {
+      setError("Verification code is required");
+      return false;
+    }
+    if (!formData.new_password) {
       setError("New password is required");
       return false;
     }
-    if (formData.newPassword.length < 8) {
+    if (formData.new_password.length < 8) {
       setError("Password must be at least 8 characters");
-      return false;
-    }
-    if (formData.newPassword !== formData.confirmPassword) {
-      setError("Passwords do not match");
       return false;
     }
     return true;
   };
 
-  const handleVerifyCode = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    if (validateCode()) {
-      try {
-        const response = await verifyCode({
-          user_email: formData.user_email,
+    if (!validateForm()) return;
+
+    try {
+      const resetResponse = await resetPassword({
+        user_email: formData.user_email,
+        new_password: formData.new_password,
+        user_otp: formData.user_otp,
+      });
+
+      if (resetResponse.success) {
+        showToast({
+          type: "success",
+          message: "Password reset successful.",
+          duration: 5000,
         });
-
-        if (response.success && response.token) {
-          setFormData((prev) => ({
-            ...prev,
-            isVerified: true,
-            token: response.token,
-          }));
-          setSuccess("Code verified successfully");
-        } else {
-          setError(response.message || "Invalid verification code");
-        }
-      } catch (error) {
-        setError("Failed to verify code");
-      }
-    }
-  };
-
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    if (!formData.token) {
-      setError("Please verify your code first");
-      return;
-    }
-
-    if (validatePassword()) {
-      try {
-        const response = await resetPassword({
-          user_email: formData.user_email,
-          new_password: formData.newPassword,
-          user_otp: formData.code,
+        setTimeout(() => {
+          navigate("/login");
+        }, 5000);
+      } else {
+        showToast({
+          type: "error",
+          message: resetResponse.message || "Failed to reset password",
+          duration: 5000,
         });
-        if (response.success) {
-          setSuccess("Password reset successful. Redirecting to login...");
-          setTimeout(() => {
-            navigate("/login");
-          }, 2000);
-        } else {
-          setError(response.message || "Failed to reset password");
-        }
-      } catch (error) {
-        setError("An error occurred. Please try again.");
       }
+    } catch (error) {
+      showToast({
+        type: "error",
+        message: "An error occurred. Please try again.",
+        duration: 5000,
+      });
     }
   };
 
@@ -122,64 +91,49 @@ const ResetPassword: React.FC = () => {
         <img src={logo} alt="Pycube Logo" className="logo" />
         <h1>Reset Password</h1>
         <p className="instruction-text">
-          {!formData.isVerified
-            ? "Enter the verification code sent to your email"
-            : "Enter your new password"}
+          Enter your email, verification code, and new password
         </p>
 
-        {!formData.isVerified ? (
-          <form onSubmit={handleVerifyCode}>
-            <InputField
-              type="text"
-              label="Verification Code"
-              placeholder="Enter verification code"
-              value={formData.code}
-              onChange={(value) =>
-                setFormData({ ...formData, code: value as string })
-              }
-              error={error}
-            />
+        <form onSubmit={handleSubmit}>
+          <InputField
+            type="email"
+            label="Email"
+            placeholder="Enter your email"
+            value={formData.user_email}
+            onChange={(value) =>
+              setFormData({ ...formData, user_email: value as string })
+            }
+          />
+          <InputField
+            type="text"
+            label="Verification Code"
+            placeholder="Enter verification code"
+            value={formData.user_otp}
+            onChange={(value) =>
+              setFormData({ ...formData, user_otp: value as string })
+            }
+          />
+          <InputField
+            type="password"
+            label="New Password"
+            placeholder="Enter new password"
+            value={formData.new_password}
+            onChange={(value) =>
+              setFormData({ ...formData, new_password: value as string })
+            }
+          />
 
-            {success && <div className="success-message">{success}</div>}
+          {error && <div className="error-message">{error}</div>}
+          {success && <div className="success-message">{success}</div>}
 
-            <Button type="submit" variant="primary" size="large" fullWidth>
-              Verify Code
-            </Button>
-          </form>
-        ) : (
-          <form onSubmit={handleResetPassword}>
-            <InputField
-              type="password"
-              label="New Password"
-              placeholder="Enter new password"
-              value={formData.newPassword}
-              onChange={(value) =>
-                setFormData({ ...formData, newPassword: value as string })
-              }
-            />
+          <Button type="submit" variant="primary" size="large" fullWidth>
+            Reset Password
+          </Button>
 
-            <InputField
-              type="password"
-              label="Confirm Password"
-              placeholder="Confirm new password"
-              value={formData.confirmPassword}
-              onChange={(value) =>
-                setFormData({ ...formData, confirmPassword: value as string })
-              }
-            />
-
-            {error && <div className="error-message">{error}</div>}
-            {success && <div className="success-message">{success}</div>}
-
-            <Button type="submit" variant="primary" size="large" fullWidth>
-              Reset Password
-            </Button>
-
-            <div className="back-to-login">
-              <a href="/login">Back to Login</a>
-            </div>
-          </form>
-        )}
+          <div className="back-to-login">
+            <a href="/login">Back to Login</a>
+          </div>
+        </form>
       </div>
     </div>
   );

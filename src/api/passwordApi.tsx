@@ -26,7 +26,7 @@ interface ResetPasswordFormData {
 
 export const API_ROUTES = {
   FORGOT_PASSWORD: "http://localhost:3001/api/forgot-password",
-  VERIFY_CODE: "http://localhost:3001/api/verify-code",
+  // VERIFY_CODE: "http://localhost:3001/api/verify-code",
   RESET_PASSWORD: "http://localhost:3001/api/reset-password",
 };
 
@@ -68,7 +68,7 @@ export const verifyCode = async (
   data: VerifyCodeRequest
 ): Promise<ApiResponse> => {
   try {
-    const response = await fetch(API_ROUTES.VERIFY_CODE, {
+    const response = await fetch(API_ROUTES.FORGOT_PASSWORD, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

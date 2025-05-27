@@ -16,6 +16,11 @@ const HomePage: React.FC = () => {
     values: [25, 30, 35, 10],
   });
 
+  const [priorityData, setPriorityData] = useState({
+    labels: ["High", "Medium", "Low"],
+    values: [40, 35, 25],
+  });
+
   const [dashboardStats, setDashboardStats] = useState({
     totalTasks: 0,
     totalProjects: 0,
@@ -86,6 +91,13 @@ const HomePage: React.FC = () => {
           <PieChart
             title="Tasks by Status"
             data={statusData}
+            enableLegend={true}
+          />
+        </div>
+        <div className="dashboard-grid-item dashboard-grid-item--small">
+          <PieChart
+            title="Tasks by Priority"
+            data={priorityData}
             enableLegend={true}
           />
         </div>

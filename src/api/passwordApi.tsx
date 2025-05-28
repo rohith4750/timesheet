@@ -1,3 +1,5 @@
+import { getAuthHeader } from './authUtils';
+
 interface ForgotPasswordFormData {
   user_email: string;
 }
@@ -10,6 +12,12 @@ interface ApiResponse {
   success: boolean;
   message?: string;
   token?: string;
+}
+
+interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
+  confirm_newpassword: string;
 }
 
 interface ResetPasswordRequestData {
@@ -28,6 +36,7 @@ export const API_ROUTES = {
   FORGOT_PASSWORD: "http://localhost:3001/api/forgot-password",
   // VERIFY_CODE: "http://localhost:3001/api/verify-code",
   RESET_PASSWORD: "http://localhost:3001/api/reset-password",
+  CHANGE_PASSWORD: "http://localhost:3001/api/changepassword",
 };
 
 export const forgotPassword = async (
@@ -93,6 +102,32 @@ export const verifyCode = async (
     return {
       success: false,
       message: error instanceof Error ? error.message : "Failed to verify code",
+    };
+  }
+};
+
+export const changePassword = async (data: ChangePasswordRequest): Promise<ApiResponse> => {
+  try {
+    const response = await fetch(API_ROUTES.CHANGE_PASSWORD, {
+      method: 'PUT',
+      headers: getAuthHeader(),
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || response.statusText);
+    }
+
+    const responseData = await response.json();
+    return {
+      success: true,
+      message: 'Password changed successfully',
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to change password',
     };
   }
 };

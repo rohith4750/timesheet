@@ -14,9 +14,10 @@ import forward from "../../assets/images/forward.svg";
 import backward from "../../assets/images/backward.svg";
 import { getIcon } from "../../hooks/common-methods";
 import Alerts from "../toast/toast";
-import { Modal } from "../popover-modal/popovarmodal";
+import { Modal } from "../../components/modal/modal";
 import refreshIcon from "../../assets/images/restart.svg";
 import deletePopup from "../../assets/images/delete-icon.svg";
+
 interface Alert {
   type: "success" | "error" | "warning" | "info";
   message: string;
@@ -104,13 +105,19 @@ export default function TableComponent({
 }: // clearButton = false,
 TableComponentProps) {
   const [data, setData] = useState<any[]>([]);
-  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [sortBy, setSortBy] = useState<any>({});
   const [sortOrder, setSortOrder] = useState<string>("ASC");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+
+  // Reset error when filters or pagination changes
+  useEffect(() => {
+    setError(null);
+  }, [currentPage, itemsPerPage, filters, sortBy, sortOrder]);
+  const navigate = useNavigate();
   const [totalRecords, setTotalRecords] = useState<number>(0);
   const debounceFilters = useDebounce(filters, 2000);
   const [isLoading, setIsLoading] = useState(false);
@@ -187,13 +194,15 @@ TableComponentProps) {
     setIsLoading(true);
     fetchData(params)
       .then((res) => {
-        setData(res.data);
+        setData(res.data || []);
         setTotalRecords(res.total);
         console.log(data, "data");
         setIsLoading(false);
       })
       .catch((err) => {
         setIsLoading(false);
+        setError("Error fetching data");
+        setData([]);
         console.error("Error fetching data:", err);
       });
   }, [currentPage, sortBy, sortOrder, dataKey, itemsPerPage, debounceFilters]);
@@ -238,52 +247,14 @@ TableComponentProps) {
   );
 
   const confirmAction = useCallback(() => {
-    if (actionType === "0" && onEdit) {
+    if (actionType === "0" && onEdit && selectedItem) {
       onEdit(selectedItem);
       setIsDialogOpen(false);
+      navigate(`/${textkey}/edit-${textkey}/${selectedItem.id}`);
     } else if (actionType === "1") {
       handleDelete(selectedItem);
     }
-  }, [actionType, onEdit, selectedItem, handleDelete]);
-
-  const getModalConfig = useCallback(
-    () => ({
-      type:
-        actionType === "0"
-          ? ("confirmation" as const)
-          : actionType === "1"
-          ? ("delete" as const)
-          : actionType === "reset"
-          ? ("reset" as const)
-          : ("confirmation" as const),
-      message:
-        actionType === "reset"
-          ? "Are your sure you want to change status to Active?"
-          : `Are you sure you want to ${
-              actionType === "0" ? "edit" : actionType === "1" ? "delete" : ""
-            } this ${textkey}?`,
-      onPrimaryClick: confirmAction,
-      onSecondaryClick: () => setIsDialogOpen(false),
-      icon:
-        actionType === "0"
-          ? editIcon
-          : actionType === "1"
-          ? deletePopup
-          : actionType === "reset"
-          ? Reset
-          : editIcon,
-      primaryButtonText:
-        actionType === "0"
-          ? "EDIT"
-          : actionType === "1"
-          ? "DELETE"
-          : actionType === "reset"
-          ? "RESET"
-          : "CONFIRM",
-      secondaryButtonText: "CANCEL",
-    }),
-    [actionType, textkey, confirmAction]
-  );
+  }, [actionType, onEdit, selectedItem, handleDelete, navigate, textkey]);
 
   const handleActionSingle = () => {
     navigate(`/${textkey}s/add-${textkey}`);
@@ -385,6 +356,44 @@ TableComponentProps) {
       setPage(page);
     }
   };
+  const getModalConfig = useCallback(
+    () => ({
+      type:
+        actionType === "0"
+          ? ("confirmation" as const)
+          : actionType === "1"
+          ? ("delete" as const)
+          : actionType === "reset"
+          ? ("reset" as const)
+          : ("confirmation" as const),
+      message:
+        actionType === "reset"
+          ? "Are your sure you want to change status to Active?"
+          : `Are you sure you want to ${
+              actionType === "0" ? "edit" : actionType === "1" ? "delete" : ""
+            } this ${textkey}?`,
+      onPrimaryClick: confirmAction,
+      onSecondaryClick: () => setIsDialogOpen(false),
+      icon:
+        actionType === "0"
+          ? editIcon
+          : actionType === "1"
+          ? deletePopup
+          : actionType === "reset"
+          ? Reset
+          : editIcon,
+      primaryButtonText:
+        actionType === "0"
+          ? "EDIT"
+          : actionType === "1"
+          ? "DELETE"
+          : actionType === "reset"
+          ? "RESET"
+          : "CONFIRM",
+      secondaryButtonText: "CANCEL",
+    }),
+    [actionType, textkey, confirmAction]
+  );
 
   return (
     <>
@@ -665,7 +674,31 @@ TableComponentProps) {
             </thead>
 
             <tbody>
-              {data.length === 0 ? (
+              {isLoading ? (
+                <tr>
+                  <td
+                    colSpan={
+                      columns.filter((col) => selectedColumns.includes(col.key))
+                        .length
+                    }
+                    className="loading-message"
+                  >
+                    Loading...
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td
+                    colSpan={
+                      columns.filter((col) => selectedColumns.includes(col.key))
+                        .length
+                    }
+                    className="error-message"
+                  >
+                    {error}
+                  </td>
+                </tr>
+              ) : !data || data.length === 0 ? (
                 <tr>
                   <td
                     colSpan={
@@ -726,9 +759,11 @@ TableComponentProps) {
                                             <button
                                               className="edit-btn"
                                               disabled={item.disableActions}
-                                              onClick={() =>
-                                                handleConfirmation(item, "0")
-                                              }
+                                              onClick={() => {
+                                                setIsDialogOpen(true);
+                                                setSelectedItem(item);
+                                                setActionType("0");
+                                              }}
                                             >
                                               <img
                                                 className="edit-icon"
@@ -741,9 +776,11 @@ TableComponentProps) {
                                             <button
                                               className="delete-btn"
                                               disabled={item.disableActions}
-                                              onClick={() =>
-                                                handleConfirmation(item, "1")
-                                              }
+                                              onClick={() => {
+                                                setIsDialogOpen(true);
+                                                setSelectedItem(item);
+                                                setActionType("1");
+                                              }}
                                             >
                                               <img
                                                 className="edit-icon"
@@ -832,12 +869,6 @@ TableComponentProps) {
               )}
             </tbody>
           </table>
-
-          <Modal
-            isOpen={isDialogOpen}
-            config={getModalConfig()}
-            onClose={() => setIsDialogOpen(false)}
-          />
         </div>
         <div className="paginator">
           <div className="paginator-controls">

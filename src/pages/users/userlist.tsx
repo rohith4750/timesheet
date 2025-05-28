@@ -13,8 +13,18 @@ import {
 import axios from "axios";
 import "./userlist.scss";
 
+interface UserListApiResponse {
+  data: UserData[];
+  total: number;
+  message: string;
+}
+
 interface FilterParams {
   filters?: Record<keyof UserData, string>;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sort_order?: string;
 }
 
 type AxiosError = {
@@ -28,6 +38,7 @@ const UserList = () => {
   const { showToast } = useToast();
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -48,63 +59,90 @@ const UserList = () => {
     {
       sortable: true,
       key: "user_sno",
-      label: "User SNO",
+      label: "S.No",
       field: "user_sno",
-      filterType: "text",
     },
     {
       sortable: true,
       key: "user_id",
       label: "User ID",
       field: "user_id",
-      filterType: "text",
     },
     {
       sortable: true,
       key: "user_name",
-      label: "Name",
+      label: "User Name",
       field: "user_name",
-      filterType: "text",
     },
     {
       sortable: true,
       key: "user_phone",
       label: "Phone",
       field: "user_phone",
-      filterType: "text",
     },
     {
       sortable: true,
       key: "user_email",
       label: "Email",
       field: "user_email",
-      filterType: "text",
+    },
+    {
+      sortable: false,
+      key: "action",
+      label: "Actions",
+      field: "action",
+      type: "action",
+      list: [
+        {
+          label: "edit",
+          btnType: "icon",
+        },
+        {
+          label: "delete",
+          btnType: "icon",
+        },
+      ],
     },
   ];
 
   const fetchData = useCallback(
     async (params: FilterParams) => {
       try {
-        const page = 1; // TODO: Implement pagination
-        const limit = 10;
-        const response = await getUsers(page, limit);
+        const response = await getUsers(params.page || 1, params.limit || 10);
+        console.log("API Response:", response); // Debug
+
+        if (!response || !response.user) {
+          console.error("Invalid response format:", response);
+          return { data: [], total: 0, users: [] };
+        }
+
+        // Ensure data is properly formatted for the table
+        const formattedData = response.user.map((user: UserData) => ({
+          ...user,
+          id: user.user_sno, // Ensure ID field is present
+          actions: true, // Enable row actions
+        }));
+
         return {
-          data: response.data,
-          total: response.total,
+          data: formattedData,
+          total: formattedData.length,
+          users: formattedData,
         };
       } catch (error) {
         console.error("Error fetching users:", error);
         if ((error as AxiosError)?.response?.status === 401) {
           navigate("/login");
         }
-        throw error;
+        return { data: [], total: 0, users: [] }; // Return empty data on error
+      } finally {
+        setLoading(false);
       }
     },
     [navigate, refreshTrigger]
-  ); // Add refreshTrigger to dependencies
+  );
 
   const handleEdit = (item: UserData) => {
-    navigate(`/user/edit/${item.id}`);
+    navigate(`/user/edit/${item.user_sno}`);
   };
 
   const handleDelete = async (item: UserData): Promise<{ message: string }> => {
@@ -115,7 +153,7 @@ const UserList = () => {
       showToast({
         type: "success",
         message: "User deleted successfully",
-        duration: 2000
+        duration: 2000,
       });
       return { message: response.message };
     } catch (error) {
@@ -126,14 +164,13 @@ const UserList = () => {
       showToast({
         type: "error",
         message: "Failed to delete user. Please try again.",
-        duration: 5000
+        duration: 5000,
       });
       throw new Error("Failed to delete user");
     }
   };
 
   useEffect(() => {
-    // Refresh data when component mounts or when returning from add/edit page
     setRefreshTrigger((prev) => prev + 1);
   }, []);
 
@@ -144,6 +181,7 @@ const UserList = () => {
           Add User
         </Button>
       </div>
+
       <TableComponent
         columns={columns}
         fetchData={fetchData}
@@ -155,6 +193,7 @@ const UserList = () => {
         createPermission="CREATE_USER"
         dataKey="users"
         textkey="user"
+        actions={true}
       />
     </div>
   );

@@ -2,7 +2,6 @@ import React, { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import TableComponent from "../../../components/table/table";
 import { permissionAccess } from "../../../hooks/permissionAccess";
-import { useToast } from "../../../components/toast/ToastContext";
 import "./projectlist.scss";
 import Button from "../../../components/button/button";
 import {
@@ -18,7 +17,6 @@ interface FilterParams {
 
 const ProjectList = () => {
   const navigate = useNavigate();
-  const { showToast } = useToast();
 
   const columns = [
     {
@@ -95,27 +93,17 @@ const ProjectList = () => {
   }, []);
 
   const handleEdit = (item: TaskData) => {
-    navigate(`/task/edit/${item.id}`);
+    navigate(`/project/edit/${item.id}`);
   };
 
   const handleDelete = async (item: TaskData): Promise<{ message: string }> => {
     try {
-      if (!item.id) throw new Error("Project ID is required");
+      if (!item.id) throw new Error("Task ID is required");
       await deleteTask(Number(item.id));
-      showToast({
-        type: "success",
-        message: "Project deleted successfully",
-        duration: 2000
-      });
-      return { message: "Project deleted successfully" };
+      return { message: "Task deleted successfully" };
     } catch (error) {
-      console.error("Error deleting project:", error);
-      showToast({
-        type: "error",
-        message: "Failed to delete project. Please try again.",
-        duration: 5000
-      });
-      throw new Error("Failed to delete project");
+      console.error("Error deleting task:", error);
+      throw new Error("Failed to delete task");
     }
   };
 
@@ -133,7 +121,7 @@ const ProjectList = () => {
             type="submit"
             variant="primary"
             size="small"
-            onClick={() => navigate("/task/add")}
+            onClick={() => navigate("/project/add")}
             fullWidth
           >
             Add Project

@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../services/auth";
-// import {
-//   checkIsSuperAdmin,
-//   fetchUserProfile,
-//   updateSuperAdminProfile,
-//   updateUserProfile,
-//   changePassword,
-// } from "../../api/profileApi";
+import { changePassword } from "../../api/passwordApi";
+import { fetchUser, UserData } from "../../api/userapi";
 import InputField from "../../components/input-component/input-component";
 import { profileFormConfig, passwordFormConfig } from "./profile-config";
+import { useToast } from "../../components/toast/ToastContext";
 import "./profile.scss";
 
 interface ProfileFormData {
@@ -16,6 +12,7 @@ interface ProfileFormData {
   lastName: string;
   email: string;
   phoneNumber: string;
+  profileImage?: string;
 }
 
 interface PasswordFormData {
@@ -26,10 +23,36 @@ interface PasswordFormData {
 
 const Profile: React.FC = () => {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [userData, setUserData] = useState<UserData | null>(null);
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const response = await fetchUser();
+        if (response.data) {
+          setUserData(response.data);
+          setFormData({
+            firstName: response.data.user_name.split(' ')[0] || '',
+            lastName: response.data.user_name.split(' ')[1] || '',
+            email: response.data.user_email || '',
+            phoneNumber: response.data.user_phone || ''
+          });
+        }
+      } catch (error: any) {
+        showToast({
+          type: "error",
+          message: error.message || "Failed to load user data",
+          duration: 3000
+        });
+      }
+    };
+    loadUserData();
+  }, []);
 
   const [formData, setFormData] = useState<ProfileFormData>({
     firstName: "",
@@ -117,32 +140,44 @@ const Profile: React.FC = () => {
   //   }
   // };
 
-  // const handlePasswordSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setError("");
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
 
-  //   if (passwordData.newPassword !== passwordData.confirmPassword) {
-  //     setError("New passwords do not match");
-  //     return;
-  //   }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      showToast({
+        type: "error",
+        message: "New passwords do not match",
+        duration: 5000,
+      });
+      return;
+    }
 
-  //   try {
-  //     await changePassword({
-  //       current_password: passwordData.currentPassword,
-  //       new_password: passwordData.newPassword,
-  //       confirm_newpassword: passwordData.confirmPassword,
-  //     });
+    const response = await changePassword({
+      current_password: passwordData.currentPassword,
+      new_password: passwordData.newPassword,
+      confirm_newpassword: passwordData.confirmPassword,
+    });
 
-  //     setPasswordData({
-  //       currentPassword: "",
-  //       newPassword: "",
-  //       confirmPassword: "",
-  //     });
-  //     setError("Password changed successfully");
-  //   } catch (err) {
-  //     setError("Failed to change password");
-  //   }
-  // };
+    if (response.success) {
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      showToast({
+        type: "success",
+        message: response.message || "Password changed successfully",
+        duration: 3000,
+      });
+    } else {
+      showToast({
+        type: "error",
+        message: response.message || "Failed to change password",
+        duration: 5000,
+      });
+    }
+  };
 
   // if (loading) {
   //   return <div className="profile-page">Loading...</div>;
@@ -152,7 +187,31 @@ const Profile: React.FC = () => {
     <div className="profile-page">
       <div className="profile-header">
         <div className="profile-info">
-          <div className="profile-image">{/* Profile image placeholder */}</div>
+          <div className="profile-image">
+            <input
+              type="file"
+              id="profile-image-upload"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  // TODO: Implement image upload API call here
+                  console.log('Image selected:', file);
+                }
+              }}
+            />
+            <label htmlFor="profile-image-upload" className="profile-image-label">
+              {/* <img
+                src={formData.profileImage || '/default-avatar.png'}
+                alt="Profile"
+                className="profile-avatar"
+              /> */}
+              {/* <div className="upload-overlay">
+                <i className="upload-icon">📷</i>
+              </div> */}
+            </label>
+          </div>
           <div className="profile-details">
             <h2>
               {formData.firstName} {formData.lastName}
@@ -183,31 +242,35 @@ const Profile: React.FC = () => {
 
       <div className="profile-content">
         {activeTab === "overview" ? (
-          <form className="profile-form">
-            <div className="form-row">
-              {profileFormConfig.map((field, index) => (
-                <div className="form-group" key={field.name}>
-                  <InputField
-                    type={field.type}
-                    label={field.label}
-                    value={formData[field.name]}
-                    onChange={(value) =>
-                      handleInputChange(field.name, value as string)
-                    }
-                    placeholder={field.placeholder}
-                    disabled={field.disabled}
-                  />
+          <div className="user-overview">
+            {userData ? (
+              <>
+                <div className="overview-item">
+                  <h3>User ID</h3>
+                  <p>{userData.user_id}</p>
                 </div>
-              ))}
-            </div>
-            <div className="form-actions">
-              <button type="submit" className="save-button">
-                Save
-              </button>
-            </div>
-          </form>
+                <div className="overview-item">
+                  <h3>Name</h3>
+                  <p>{userData.user_name}</p>
+                </div>
+                <div className="overview-item">
+                  <h3>Email</h3>
+                  <p>{userData.user_email}</p>
+                </div>
+                <div className="overview-item">
+                  <h3>Phone Number</h3>
+                  <p>{userData.user_phone}</p>
+                </div>
+              </>
+            ) : (
+              <div className="loading-message">Loading user data...</div>
+            )}
+          </div>
         ) : (
-          <form className="change-password-form">
+          <form
+            className="change-password-form"
+            onSubmit={handlePasswordSubmit}
+          >
             {passwordFormConfig.map((field) => (
               <div className="form-group" key={field.name}>
                 <InputField

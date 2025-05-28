@@ -1,3 +1,23 @@
+// Define breakpoints
+$breakpoints: (
+  "sm": 576px,
+  "md": 768px,
+  "lg": 992px,
+  "xl": 1200px,
+);
+
+// Define the respond-to mixin
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: map-get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @warn "Unknown breakpoint: #{$breakpoint}.";
+  }
+}
+
+// Your existing SCSS
 .forgot-password-container {
   display: flex;
   justify-content: center;
@@ -14,6 +34,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
+    transform: scale(0.7);
 
     .logo {
       width: 120px;
@@ -60,6 +81,45 @@
           }
         }
       }
+    }
+  }
+
+  .login-right {
+    display: none; // Hide on mobile by default
+
+    @include respond-to("md") {
+      width: 50%;
+      display: flex;
+      padding: 2rem;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      flex: 1 0 0;
+      align-self: stretch;
+      border-radius: 0.875rem;
+    }
+
+    @include respond-to("lg") {
+      padding: 3rem;
+    }
+
+    .right-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      @include respond-to("lg") {
+        margin-left: 2.5rem;
+      }
+    }
+
+    .design-system-cover {
+      width: 100%;
+      height: auto;
+      border-radius: 0.75rem;
+      max-width: 450px;
     }
   }
 }

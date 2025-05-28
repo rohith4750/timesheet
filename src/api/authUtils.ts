@@ -33,9 +33,9 @@ export const isTokenExpired = (token: AuthToken): boolean => {
 };
 
 // Get authentication header
-export const getAuthHeader = () => {
+export const getAuthHeader = (): Record<string, string> => {
   const token = getAuthToken();
-  if (!token) return {};
+  if (!token) return { 'Content-Type': 'application/json' };
   
   return {
     'Authorization': `Bearer ${token.accessToken}`,

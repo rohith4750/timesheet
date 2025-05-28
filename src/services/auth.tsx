@@ -56,11 +56,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      setIsAuthenticated(true);
-      // TODO: Fetch user data if needed
-    }
+    const checkAuthStatus = () => {
+      const token = localStorage.getItem('auth_token');
+      const isLogin = localStorage.getItem('isLogin');
+      if (token && isLogin === 'true') {
+        try {
+          const parsedToken = JSON.parse(token);
+          const isExpired = Date.now() >= parsedToken.expiresIn;
+          
+          if (!parsedToken.accessToken) {
+            throw new Error('Invalid token format');
+          }
+          
+          if (!isExpired) {
+            setIsAuthenticated(true);
+            setUser({ username: parsedToken.username });
+            return;
+          }
+        } catch (error) {
+          console.error('Error parsing auth token:', error);
+          // Clear invalid auth state
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('isLogin');
+        }
+      }
+      // If we get here, either token is invalid, expired, or missing
+      setIsAuthenticated(false);
+      setUser(null);
+    };
+
+    checkAuthStatus();
+    // Add event listener for storage changes
+    window.addEventListener('storage', checkAuthStatus);
+    return () => window.removeEventListener('storage', checkAuthStatus);
   }, []);
 
   const login = async (user_email: string, password: string) => {
@@ -79,16 +107,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       const data = await response.json();
-      localStorage.setItem("accessToken", data.accessToken);
+      const authToken = {
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        expiresIn: Date.now() + (24 * 60 * 60 * 1000), // 24 hours from now
+        username: user_email
+      };
+      localStorage.setItem('auth_token', JSON.stringify(authToken));
+      localStorage.setItem('isLogin', 'true');
       setIsAuthenticated(true);
       setUser({ username: user_email });
       setAlerts([
         { type: "success", text: "Successfully logged in!", duration: 3000 },
       ]);
-      // Add a small delay to ensure toast is visible before navigation
-      setTimeout(() => {
-        navigate("/home-page");
-      }, 10000000);
+      navigate("/home-page");
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(error.message);
@@ -98,10 +130,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("accessToken");
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('isLogin');
     setIsAuthenticated(false);
     setUser(null);
-    navigate("/login");
+    navigate('/login');
   };
 
   return (

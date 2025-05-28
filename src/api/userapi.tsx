@@ -10,17 +10,20 @@ export interface UserData {
   user_name: string;
   user_phone: string;
   user_email: string;
+  actions?: boolean;
+  user_status?: string;
+  is_super_admin?: boolean;
 }
 
 export interface UserResponse {
-  data: UserData;
+  userDetails: UserData;
   message: string;
 }
 
 export interface UserListResponse {
-  data: UserData[];
-  total: number;
-  message: string;
+  success: boolean;
+  statusCode: number;
+  user: UserData[];
 }
 
 export interface SuperAdminResponse {
@@ -101,5 +104,41 @@ export const deleteUser = async (userSno: string) => {
     return response.data;
   } catch (error) {
     throw error;
+  }
+};
+
+// Fetch single user
+export const fetchUser = async () => {
+  try {
+    // Check if we have a valid auth token before making the request
+    const token = getAuthToken();
+    if (!token || !token.accessToken) {
+      throw new Error('No valid authentication token found');
+    }
+
+    const response = await axios.get<UserResponse>(
+      `${API_BASE_URL}/fetch/user`,
+      { headers: getAuthHeader() }
+    );
+    
+    if (!response.data || !response.data.userDetails) {
+      throw new Error('Invalid response format from server');
+    }
+    
+    return {
+      data: response.data.userDetails,
+      message: response.data.message
+    };
+  } catch (error: any) {
+    if (error?.response) {
+      const message = error.response.data?.message || 'Failed to fetch user data';
+      console.error('API Error:', message);
+      throw new Error(message);
+    } else if (error?.request) {
+      console.error('Network Error: No response received');
+      throw new Error('No response received from server');
+    }
+    console.error('Error:', error?.message || 'Unknown error');
+    throw new Error(error?.message || 'Failed to load user data');
   }
 };

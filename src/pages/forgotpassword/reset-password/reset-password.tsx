@@ -6,7 +6,7 @@ import { resetPassword, verifyCode } from "../../../api/passwordApi";
 import { useToast } from "../../../components/toast/ToastContext";
 import "./reset-password.scss";
 import logo from "../../../assets/icons/pycube-logo.svg";
-
+import design from "../../../assets/icons/timesheet-login.svg";
 interface ResetPasswordFormData {
   user_email: string;
   user_otp: string;
@@ -134,6 +134,15 @@ const ResetPassword: React.FC = () => {
             <a href="/login">Back to Login</a>
           </div>
         </form>
+      </div>
+      <div className="login-right">
+        <div className="right-container">
+          <img
+            src={design}
+            alt="Design System Cover"
+            className="design-system-cover"
+          />
+        </div>
       </div>
     </div>
   );

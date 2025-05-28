@@ -1,8 +1,8 @@
 interface ProfileFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
+  user_id: string;
+  user_name: string;
+  user_email: string;
+  user_phone: string;
 }
 
 interface PasswordFormData {
@@ -28,25 +28,31 @@ interface PasswordFormConfig extends BaseFormConfig {
 
 export const profileFormConfig: ProfileFormConfig[] = [
   {
-    name: "firstName",
-    label: "First Name*",
-    type: "text",
-    placeholder: "Enter your first name",
+    name: "user_id",
+    label: "User Id",
+    type: "number",
+    placeholder: "Enter your phone number",
   },
   {
-    name: "lastName",
-    label: "Last Name*",
+    name: "user_name",
+    label: "User Name",
     type: "text",
-    placeholder: "Enter your last name",
+    placeholder: "Enter your phone number",
   },
   {
-    name: "phoneNumber",
+    name: "user_phone",
     label: "Phone Number*",
     type: "text",
     placeholder: "Enter your phone number",
   },
   {
-    name: "email",
+    name: "user_phone",
+    label: "Phone Number*",
+    type: "text",
+    placeholder: "Enter your phone number",
+  },
+  {
+    name: "user_email",
     label: "Email Address*",
     type: "email",
     placeholder: "Enter your email",

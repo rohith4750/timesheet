@@ -32,6 +32,12 @@ export const loginUser = async (
     }
 
     const data: ApiLoginResponse = await response.json();
+    localStorage.setItem('auth_token', JSON.stringify({
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      expiresIn: Date.now() + (24 * 60 * 60 * 1000) // 24 hours from now
+    }));
+    localStorage.setItem('isLogin', 'true');
     return {
       success: true,
       token: data.accessToken,

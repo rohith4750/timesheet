@@ -6,6 +6,7 @@ import { forgotPassword } from "../../../api/passwordApi";
 import { useToast } from "../../../components/toast/ToastContext";
 import "./verify.scss";
 import logo from "../../../assets/icons/pycube-logo.svg";
+import design from "../../../assets/icons/timesheet-login.svg";
 
 interface ForgotPasswordFormData {
   user_email: string;
@@ -41,24 +42,27 @@ const Verification: React.FC = () => {
         if (response.success) {
           showToast({
             type: "success",
-            message: response.message || "Reset instructions sent to your email",
-            duration: 3000
+            message:
+              response.message || "Reset instructions sent to your email",
+            duration: 3000,
           });
           setTimeout(() => {
-            navigate("/forgot-password/reset?email=" + encodeURIComponent(email));
+            navigate(
+              "/forgot-password/reset?email=" + encodeURIComponent(email)
+            );
           }, 3000);
         } else {
           showToast({
             type: "error",
             message: response.message || "Failed to process request",
-            duration: 5000
+            duration: 5000,
           });
         }
       } catch (error) {
         showToast({
           type: "error",
           message: "An error occurred. Please try again.",
-          duration: 5000
+          duration: 5000,
         });
       }
     }
@@ -66,34 +70,45 @@ const Verification: React.FC = () => {
 
   return (
     <div className="forgot-password-container">
-      <div className="forgot-password-card">
-        <img src={logo} alt="Pycube Logo" className="logo" />
-        <h1>Forgot Password</h1>
-        <p className="instruction-text">
-          Enter your email address and we'll send you instructions to reset your
-          password.
-        </p>
+      <div className="forgot-password-left">
+        <div className="forgot-password-card">
+          <img src={logo} alt="Pycube Logo" className="logo" />
+          <h1>Forgot Password</h1>
+          <p className="instruction-text">
+            Enter your email address and we'll send you instructions to reset
+            your password.
+          </p>
 
-        <form onSubmit={handleSubmit}>
-          <InputField
-            type="email"
-            label="Email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(value) => setEmail(value as string)}
-            error={error}
+          <form onSubmit={handleSubmit}>
+            <InputField
+              type="email"
+              label="Email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(value) => setEmail(value as string)}
+              error={error}
+            />
+
+            {success && <div className="success-message">{success}</div>}
+
+            <Button type="submit" variant="primary" size="large" fullWidth>
+              Send Verification Code
+            </Button>
+
+            <div className="back-to-login">
+              <Link to="/login">Back to Login</Link>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div className="login-right">
+        <div className="right-container">
+          <img
+            src={design}
+            alt="Design System Cover"
+            className="design-system-cover"
           />
-
-          {success && <div className="success-message">{success}</div>}
-
-          <Button type="submit" variant="primary" size="large" fullWidth>
-            Send Verification Code
-          </Button>
-
-          <div className="back-to-login">
-            <Link to="/login">Back to Login</Link>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );

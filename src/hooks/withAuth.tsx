@@ -1,11 +1,18 @@
 import React from 'react'
 import { Navigate } from 'react-router-dom'
 import { permissionAccess, userRoleAccess } from './permissionAccess'
+import { Permission, Role } from '../constants/permissions'
 
-const withRoleAuthorization = (WrappedComponent: React.FC, item: any) => {
+interface AuthProps {
+  userRole?: Role[];
+  permissions?: Permission | 'ALL';
+}
+
+const withRoleAuthorization = (WrappedComponent: React.FC, item: AuthProps) => {
   return (props: any) => {
-    if (userRoleAccess(item.userRole)[0] !== 'SYSTEM_ADMIN') {
-      if (permissionAccess(item.permissions)) {
+    const hasRole = userRoleAccess(item.userRole || []);
+    if (!hasRole) {
+      if (permissionAccess(item.permissions || 'ALL')) {
         return <WrappedComponent {...props} />
       } else {
         return <Navigate to='/unauthorized' replace={true} />
@@ -16,7 +23,7 @@ const withRoleAuthorization = (WrappedComponent: React.FC, item: any) => {
   }
 }
 
-export const withAuthentication = (WrappedComponent: React.FC, item: any) => {
+export const withAuthentication = (WrappedComponent: React.FC, item: AuthProps) => {
   return (props: any) => {
     const isAuthenticated = localStorage.getItem('isLogin') === 'true' && localStorage.getItem('auth_token') !== null
 

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TableComponent from "../../components/table/table";
 import { permissionAccess } from "../../hooks/permissionAccess";
@@ -10,6 +10,8 @@ import {
   deleteTask,
   TaskData as ApiTaskData,
 } from "../../api/taskApi";
+import { Permission } from "../../constants/permissions";
+
 type TaskData = Omit<ApiTaskData, "id"> & { id?: string };
 
 interface FilterParams {
@@ -19,6 +21,18 @@ interface FilterParams {
 const TaskList = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const [data, setData] = useState<TaskData[]>([]);
+  const [filteredData, setFilteredData] = useState<TaskData[]>([]);
+
+  useEffect(() => {
+    // Debug logs
+    const userRole = localStorage.getItem("userRole");
+    console.log("Current user role:", userRole);
+    console.log(
+      "Has CREATE_TASK permission:",
+      permissionAccess("create_task" as Permission)
+    );
+  }, []);
 
   const columns = [
     {
@@ -63,13 +77,13 @@ const TaskList = () => {
       const limit = 10;
       const response = await getTasks(page, limit);
 
-      let filteredData = response.data;
+      let filteredData = response.task || [];
 
       // Apply filters if they exist
       if (params.filters) {
         Object.entries(params.filters).forEach(([key, value]) => {
-          if (value && key in (filteredData[0] || {})) {
-            filteredData = filteredData.filter((item) => {
+          if (value && filteredData.length > 0 && key in filteredData[0]) {
+            filteredData = filteredData.filter((item: TaskData) => {
               const itemValue = item[key as keyof TaskData];
               if (typeof itemValue !== "string") return false;
               if (key === "task_start_at") {
@@ -81,9 +95,10 @@ const TaskList = () => {
         });
       }
 
+      setData(filteredData);
       return {
         data: filteredData,
-        total: response.total,
+        total: response.total || 0,
       };
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -93,6 +108,25 @@ const TaskList = () => {
       };
     }
   }, []);
+
+  const handleFilter = (params: FilterParams) => {
+    let newFilteredData = [...data];
+    if (params.filters) {
+      Object.entries(params.filters).forEach(([key, value]) => {
+        if (value && newFilteredData.length > 0 && key in newFilteredData[0]) {
+          newFilteredData = newFilteredData.filter((item: TaskData) => {
+            const itemValue = item[key as keyof TaskData];
+            if (typeof itemValue !== "string") return false;
+            if (key === "task_start_at") {
+              return itemValue.toLowerCase().includes(value.toLowerCase());
+            }
+            return itemValue.toLowerCase().includes(value.toLowerCase());
+          });
+        }
+      });
+    }
+    setFilteredData(newFilteredData);
+  };
 
   const handleEdit = (item: TaskData) => {
     navigate(`/task/edit/${item.id}`);
@@ -105,7 +139,7 @@ const TaskList = () => {
       showToast({
         type: "success",
         message: "Task deleted successfully",
-        duration: 2000
+        duration: 2000,
       });
       return { message: "Task deleted successfully" };
     } catch (error) {
@@ -113,7 +147,7 @@ const TaskList = () => {
       showToast({
         type: "error",
         message: "Failed to delete task. Please try again.",
-        duration: 5000
+        duration: 5000,
       });
       throw new Error("Failed to delete task");
     }
@@ -122,13 +156,7 @@ const TaskList = () => {
   return (
     <div className="task-list-container">
       <div className="task-list-header">
-        {permissionAccess("CREATE_TASK") && (
-          // <button
-          //   className="add-task-button"
-          //   onClick={() => navigate('/task/add')}
-          // >
-          //   Add Task
-          // </button>
+        {permissionAccess("create_task" as Permission) && (
           <Button
             type="submit"
             variant="primary"
@@ -136,7 +164,7 @@ const TaskList = () => {
             onClick={() => navigate("/task/add")}
             fullWidth
           >
-            Add task
+            Add Task
           </Button>
         )}
       </div>
@@ -148,9 +176,9 @@ const TaskList = () => {
         heading="Task"
         textkey="task"
         navKey={true}
-        createPermission="CREATE_TASK"
-        deletePermission="DELETE_TASK"
-        updatePermission="UPDATE_TASK"
+        createPermission="create_task"
+        deletePermission="delete_task"
+        updatePermission="update_task"
         dataKey="tasks"
       />
     </div>

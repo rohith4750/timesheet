@@ -3,43 +3,44 @@ import { useNavigate } from "react-router-dom";
 import ReusableForm from "../../../components/reusable-form/reusableform";
 import { useToast } from "../../../components/toast/ToastContext";
 import { createProject } from "../../../api/projectApi";
-import { getUsers, UserData } from "../../../api/userapi";
+import { getUsers, UserData } from "../../../api/userApi";
 import "./add-project.scss";
 
 interface TaskFormData {
   project_name: string;
   project_description: string;
   project_manager: string;
+  start_date: string;
+  end_date: string;
+  status: string;
 }
 
 const AddProject: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [managers, setManagers] = useState<{ label: string; value: string }[]>(
-    []
-  );
+  const [managers, setManagers] = useState<Array<{ label: string; value: string }>>([]);
 
-  // Fetch users for project manager dropdown
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchManagers = async () => {
       try {
         const users = await getUsers();
-        const formattedManagers = users.user.map((user: UserData) => ({
-          label: user.user_name,
-          value: user.user_id,
+        const formattedManagers = (users.users || []).map((user: UserData) => ({
+          label: user.user_fullname,
+          value: user.emp_id,
         }));
         setManagers(formattedManagers);
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching managers:", error);
         showToast({
           type: "error",
-          message: "Failed to load users.",
-          duration: 3000,
+          message: "Failed to load managers. Please try again.",
+          duration: 5000,
         });
       }
     };
-    fetchUsers();
-  }, [showToast]);
+
+    fetchManagers();
+  }, []);
 
   const formFields = [
     {

@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import "./App.scss";
 import { routes } from "./constants/routes";
@@ -17,9 +18,53 @@ import ResetPassword from "./pages/forgotpassword/reset-password/reset-password"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  const location = useLocation();
+  const [isChecking, setIsChecking] = useState(true);
+  const [isValid, setIsValid] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      try {
+        const token = localStorage.getItem('auth_token');
+        const isLogin = localStorage.getItem('isLogin');
+        const userRole = localStorage.getItem('userRole');
+
+        if (token && isLogin === 'true' && userRole) {
+          const parsedToken = JSON.parse(token);
+          const isExpired = Date.now() >= parsedToken.expiresIn;
+
+          if (!isExpired && parsedToken.accessToken) {
+            setIsValid(true);
+          } else {
+            // Clear invalid auth state
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('isLogin');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('permissions');
+            setIsValid(false);
+          }
+        } else {
+          setIsValid(false);
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        setIsValid(false);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    checkAuth();
+  }, [location]);
+
+  if (isChecking) {
+    return null; // or a loading spinner
   }
+
+  if (!isValid || !isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
   return <>{children}</>;
 };
 
@@ -41,7 +86,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password/verification" element={<Verification />} />
               <Route path="/forgot-password/reset" element={<ResetPassword />} />
-              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/" element={<Navigate to="/home-page" replace />} />
               <Route
                 element={
                   <ProtectedRoute>

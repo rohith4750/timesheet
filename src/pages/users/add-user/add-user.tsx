@@ -2,15 +2,10 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import ReusableForm from "../../../components/reusable-form/reusableform";
 import { useToast } from "../../../components/toast/ToastContext";
-import { createUser } from "../../../api/userapi";
+import { createUser, UserData } from "../../../api/userApi";
 import "./add-user.scss";
 
-interface UserFormData {
-  user_id: string;
-  user_name: string;
-  user_phone: string;
-  user_email: string;
-}
+type UserFormData = Omit<UserData, "user_sno">;
 
 const AddUser: React.FC = (): React.ReactElement => {
   const navigate = useNavigate();
@@ -20,16 +15,37 @@ const AddUser: React.FC = (): React.ReactElement => {
     {
       label: "User ID",
       type: "text",
-      name: "user_id",
+      name: "emp_id",
       required: true,
       placeholder: "Enter User ID",
     },
     {
-      label: "User Name",
+      label: "First Name",
       type: "text",
-      name: "user_name",
+      name: "user_firstname",
       required: true,
-      placeholder: "Enter User Name",
+      placeholder: "Enter First Name",
+    },
+    {
+      label: "Middle Name",
+      type: "text",
+      name: "user_middlename",
+      required: true,
+      placeholder: "Enter Middle Name",
+    },
+    {
+      label: "Last Name",
+      type: "text",
+      name: "user_lastname",
+      required: true,
+      placeholder: "Enter Last Name",
+    },
+    {
+      label: "Full Name",
+      type: "text",
+      name: "user_fullname",
+      required: true,
+      placeholder: "Enter Full Name",
     },
     {
       label: "Phone Number",
@@ -44,6 +60,17 @@ const AddUser: React.FC = (): React.ReactElement => {
       name: "user_email",
       required: true,
       placeholder: "Enter Email",
+    },
+    {
+      label: "Role",
+      type: "select",
+      name: "role",
+      required: true,
+      placeholder: "Select Role",
+      options: [
+        { value: "ADMIN", label: "Admin" },
+        { value: "USER", label: "User" },
+      ],
     },
   ];
 

@@ -17,7 +17,13 @@ $breakpoints: (
   }
 }
 
-// Your existing SCSS
+.buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
 .forgot-password-container {
   display: flex;
   justify-content: center;
@@ -34,7 +40,6 @@ $breakpoints: (
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
-    transform: scale(0.7);
 
     .logo {
       width: 120px;
@@ -68,8 +73,7 @@ $breakpoints: (
 
       .back-to-login {
         text-align: center;
-        margin-bottom: 20px;
-        overflow: hidden;
+        margin-top: 20px;
 
         a {
           color: var(--button-primary-default);
@@ -85,41 +89,111 @@ $breakpoints: (
   }
 
   .login-right {
-    display: none; // Hide on mobile by default
+    display: none;
+    background-color: #0a192f;
 
     @include respond-to("md") {
-      width: 50%;
       display: flex;
+      width: 50%;
       padding: 2rem;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      flex: 1 0 0;
       align-self: stretch;
-      border-radius: 0.875rem;
-    }
-
-    @include respond-to("lg") {
-      padding: 3rem;
+      transform: scale(0.9);
     }
 
     .right-container {
       width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      max-width: 200px;
 
-      @include respond-to("lg") {
-        margin-left: 2.5rem;
+      .timesheet-illustration {
+        color: #ffffff;
+        text-align: center;
+
+        .timesheet-title {
+          font-size: 2.5rem;
+          font-weight: bold;
+          margin-bottom: 2rem;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .timesheet-grid {
+          position: relative;
+          background: transparent;
+          border: 2px solid #ffffff;
+          border-radius: 8px;
+          padding: 2rem;
+          margin: 0 auto;
+          width: 80%;
+
+          .user-icon {
+            position: absolute;
+            top: -30px;
+            left: 20px;
+
+            .user-circle {
+              width: 40px;
+              height: 40px;
+              border: 2px solid #ffffff;
+              border-radius: 50%;
+              margin-bottom: 5px;
+            }
+
+            .user-line {
+              width: 60px;
+              height: 2px;
+              background-color: #ffffff;
+            }
+          }
+
+          .grid-container {
+            margin-top: 2rem;
+
+            .grid-row {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 1rem;
+
+              .grid-cell {
+                width: 60px;
+                height: 40px;
+                border: 1px solid rgba(255, 255, 255, 0.5);
+                border-radius: 4px;
+                transition: all 0.3s ease;
+
+                &:hover {
+                  background-color: rgba(255, 255, 255, 0.1);
+                }
+              }
+            }
+          }
+
+          .clock-icon {
+            position: absolute;
+            top: -20px;
+            right: 20px;
+
+            .clock-circle {
+              width: 40px;
+              height: 40px;
+              border: 2px solid #ffffff;
+              border-radius: 50%;
+              position: relative;
+            }
+
+            .clock-hand {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              width: 15px;
+              height: 2px;
+              background-color: #ffffff;
+              transform: translate(-50%, -50%) rotate(45deg);
+              transform-origin: left center;
+            }
+          }
+        }
       }
-    }
-
-    .design-system-cover {
-      width: 100%;
-      height: auto;
-      border-radius: 0.75rem;
-      max-width: 450px;
     }
   }
 }

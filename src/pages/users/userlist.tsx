@@ -9,7 +9,7 @@ import {
   deleteUser,
   UserData,
   checkSuperAdmin,
-} from "../../api/userapi";
+} from "../../api/userApi";
 import axios from "axios";
 import "./userlist.scss";
 
@@ -111,13 +111,13 @@ const UserList = () => {
         const response = await getUsers(params.page || 1, params.limit || 10);
         console.log("API Response:", response); // Debug
 
-        if (!response || !response.user) {
+        if (!response || !response.users) {
           console.error("Invalid response format:", response);
           return { data: [], total: 0, users: [] };
         }
 
         // Ensure data is properly formatted for the table
-        const formattedData = response.user.map((user: UserData) => ({
+        const formattedData = response.users.map((user: UserData) => ({
           ...user,
           id: user.user_sno, // Ensure ID field is present
           actions: true, // Enable row actions
@@ -155,7 +155,7 @@ const UserList = () => {
         message: "User deleted successfully",
         duration: 2000,
       });
-      return { message: response.message };
+      return { message: "User deleted successfully" };
     } catch (error) {
       console.error("Error deleting user:", error);
       if ((error as AxiosError)?.response?.status === 401) {

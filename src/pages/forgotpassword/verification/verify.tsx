@@ -6,7 +6,6 @@ import { forgotPassword } from "../../../api/passwordApi";
 import { useToast } from "../../../components/toast/ToastContext";
 import "./verify.scss";
 import logo from "../../../assets/icons/pycube-logo.svg";
-import design from "../../../assets/icons/timesheet-login.svg";
 
 interface ForgotPasswordFormData {
   user_email: string;
@@ -90,11 +89,11 @@ const Verification: React.FC = () => {
             />
 
             {success && <div className="success-message">{success}</div>}
-
-            <Button type="submit" variant="primary" size="large" fullWidth>
-              Send Verification Code
-            </Button>
-
+            <div className="buttons">
+              <Button type="submit" variant="primary" size="large" fullWidth>
+                Verify Code
+              </Button>
+            </div>
             <div className="back-to-login">
               <Link to="/login">Back to Login</Link>
             </div>
@@ -103,11 +102,36 @@ const Verification: React.FC = () => {
       </div>
       <div className="login-right">
         <div className="right-container">
-          <img
-            src={design}
-            alt="Design System Cover"
-            className="design-system-cover"
-          />
+          <div className="timesheet-illustration">
+            <div className="timesheet-title">TIMESHEET</div>
+            <div className="timesheet-grid">
+              <div className="user-icon">
+                <div className="user-circle"></div>
+                <div className="user-line"></div>
+              </div>
+              <div className="grid-container">
+                <div className="grid-row">
+                  <div className="grid-cell"></div>
+                  <div className="grid-cell"></div>
+                  <div className="grid-cell"></div>
+                </div>
+                <div className="grid-row">
+                  <div className="grid-cell"></div>
+                  <div className="grid-cell"></div>
+                  <div className="grid-cell"></div>
+                </div>
+                <div className="grid-row">
+                  <div className="grid-cell"></div>
+                  <div className="grid-cell"></div>
+                  <div className="grid-cell"></div>
+                </div>
+              </div>
+              <div className="clock-icon">
+                <div className="clock-circle"></div>
+                <div className="clock-hand"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

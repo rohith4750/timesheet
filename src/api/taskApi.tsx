@@ -30,10 +30,10 @@ export interface TaskResponse {
   message: string;
 }
 
-export interface TaskListResponse {
-  data: TaskData[];
+interface TaskListResponse {
+  task: TaskData[];
   total: number;
-  message: string;
+  message?: string;
 }
 
 const BASE_URL = '/api/tasks';
@@ -83,11 +83,18 @@ export const withdrawTask = async (taskId: number) => {
 export const getTasks = async (page: number = 1, limit: number = 10) => {
   try {
     const response = await axios.get<TaskListResponse>(
-      `${BASE_URL}?page=${page}&limit=${limit}`,
-      { headers: getAuthHeader() }
+      `${API_BASE_URL}/list/tasks`,
+      {
+        params: {
+          page,
+          limit
+        },
+        headers: getAuthHeader()
+      }
     );
     return response.data;
   } catch (error) {
+    console.error('Error fetching tasks:', error);
     throw error;
   }
 };
@@ -105,37 +112,45 @@ export const getTaskById = async (id: number) => {
 };
 
 // Create a new task
-export const createTask = async (taskData: Omit<TaskData, 'id'>) => {
+export const createTask = async (taskData: Omit<TaskData, 'id' | 'ut_sno'>) => {
   try {
-    const response = await axios.post<TaskResponse>(BASE_URL, taskData, {
-      headers: getAuthHeader(),
-    });
+    const response = await axios.post(
+      `${API_BASE_URL}/create/task`,
+      taskData,
+      { headers: getAuthHeader() }
+    );
     return response.data;
   } catch (error) {
+    console.error('Error creating task:', error);
     throw error;
   }
 };
 
 // Update an existing task
-export const updateTask = async (id: number, taskData: Partial<TaskData>) => {
+export const updateTask = async (taskId: number, taskData: Partial<TaskData>) => {
   try {
-    const response = await axios.put<TaskResponse>(`${BASE_URL}/${id}`, taskData, {
-      headers: getAuthHeader(),
-    });
+    const response = await axios.put(
+      `${API_BASE_URL}/update/task/${taskId}`,
+      taskData,
+      { headers: getAuthHeader() }
+    );
     return response.data;
   } catch (error) {
+    console.error('Error updating task:', error);
     throw error;
   }
 };
 
 // Delete a task
-export const deleteTask = async (id: number) => {
+export const deleteTask = async (taskId: number) => {
   try {
-    const response = await axios.delete<{ message: string }>(`${BASE_URL}/${id}`, {
-      headers: getAuthHeader(),
-    });
+    const response = await axios.delete(
+      `${API_BASE_URL}/delete/task/${taskId}`,
+      { headers: getAuthHeader() }
+    );
     return response.data;
   } catch (error) {
+    console.error('Error deleting task:', error);
     throw error;
   }
 };

@@ -1,18 +1,20 @@
-import axios from 'axios';
-import { getAuthToken } from './authUtils';
+import axios from "axios";
+import { getAuthToken } from "./authUtils";
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = "http://localhost:3001/api";
 
 export interface UserData {
-  id?: string;
   user_sno: string;
-  user_id: string;
-  user_name: string;
+  emp_id: string;
+  user_firstname: string;
+  user_middlename: string;
+  user_lastname: string;
+  user_fullname: string;
   user_phone: string;
   user_email: string;
   actions?: boolean;
   user_status?: string;
-  is_super_admin?: boolean;
+  role: string;
 }
 
 export interface UserResponse {
@@ -32,10 +34,10 @@ export interface SuperAdminResponse {
 
 const getAuthHeader = () => {
   const token = getAuthToken();
-  if (!token) throw new Error('No authentication token found');
+  if (!token) throw new Error("No authentication token found");
   return {
-    'Authorization': `Bearer ${token.accessToken}`,
-    'Content-Type': 'application/json'
+    Authorization: `Bearer ${token.accessToken}`,
+    "Content-Type": "application/json",
   };
 };
 
@@ -61,13 +63,16 @@ export const checkSuperAdmin = async (): Promise<boolean> => {
     );
     return response.data.is_super_admin;
   } catch (error) {
-    console.error('Error checking super admin status:', error);
+    console.error("Error checking super admin status:", error);
     return false;
   }
 };
 
 // Update user
-export const updateUser = async (id: string, userData: Omit<UserData, 'id'>) => {
+export const updateUser = async (
+  id: string,
+  userData: Omit<UserData, "id">
+) => {
   try {
     const response = await axios.put<UserResponse>(
       `${API_BASE_URL}/modify/user/${id}`,
@@ -81,7 +86,9 @@ export const updateUser = async (id: string, userData: Omit<UserData, 'id'>) => 
 };
 
 // Create user
-export const createUser = async (userData: Omit<UserData, 'id' | 'user_sno'>) => {
+export const createUser = async (
+  userData: Omit<UserData, "id" | "user_sno">
+) => {
   try {
     const response = await axios.post<UserResponse>(
       `${API_BASE_URL}/create/user`,
@@ -113,32 +120,33 @@ export const fetchUser = async () => {
     // Check if we have a valid auth token before making the request
     const token = getAuthToken();
     if (!token || !token.accessToken) {
-      throw new Error('No valid authentication token found');
+      throw new Error("No valid authentication token found");
     }
 
     const response = await axios.get<UserResponse>(
       `${API_BASE_URL}/fetch/user`,
       { headers: getAuthHeader() }
     );
-    
+
     if (!response.data || !response.data.userDetails) {
-      throw new Error('Invalid response format from server');
+      throw new Error("Invalid response format from server");
     }
-    
+
     return {
       data: response.data.userDetails,
-      message: response.data.message
+      message: response.data.message,
     };
   } catch (error: any) {
     if (error?.response) {
-      const message = error.response.data?.message || 'Failed to fetch user data';
-      console.error('API Error:', message);
+      const message =
+        error.response.data?.message || "Failed to fetch user data";
+      console.error("API Error:", message);
       throw new Error(message);
     } else if (error?.request) {
-      console.error('Network Error: No response received');
-      throw new Error('No response received from server');
+      console.error("Network Error: No response received");
+      throw new Error("No response received from server");
     }
-    console.error('Error:', error?.message || 'Unknown error');
-    throw new Error(error?.message || 'Failed to load user data');
+    console.error("Error:", error?.message || "Unknown error");
+    throw new Error(error?.message || "Failed to load user data");
   }
 };

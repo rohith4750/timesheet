@@ -33,7 +33,7 @@ const HomePage: React.FC = () => {
         const response = await getTasks(1, 100);
         // Process data for charts here
         setDashboardStats({
-          totalTasks: response.data.length || 0,
+          totalTasks: response.task?.length || 0,
           totalProjects: 15, // Replace with actual API call
           totalUsers: 25, // Replace with actual API call
         });

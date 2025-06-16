@@ -1,22 +1,27 @@
-export function permissionAccess(type: string) {
-  let roles = localStorage.getItem('permissions')?.replace(/ /g, '')?.split(',') ?? []
-  let allowedRoles = type.replace(/ /g, '').split(',') ?? []
-  let hasPermission =
-    allowedRoles?.length && roles?.length ? roles.some((role) => allowedRoles.includes(role)) : true
-  if (type === 'ALL') {
-    hasPermission = true
+import { PERMISSIONS, ROLES, hasPermission, Permission, Role } from '../constants/permissions';
+
+export function permissionAccess(permission: Permission | 'ALL'): boolean {
+  if (permission === 'ALL') {
+    return true;
   }
-  return hasPermission
+
+  const userRole = localStorage.getItem('userRole') as Role;
+  if (!userRole) {
+    return false;
+  }
+
+  return hasPermission(userRole, permission);
 }
 
-export function userRoleAccess(userRoles: any) {
-  console.log('userRoleAccess - ', userRoles)
-  let role = localStorage.getItem('userRole') ?? ''
-  let allowedRole = userRoles ?? []
-  let hasPermission = allowedRole.filter((item: any) => item === role)
-  return hasPermission
+export function userRoleAccess(allowedRoles: Role[]): boolean {
+  const userRole = localStorage.getItem('userRole') as Role;
+  if (!userRole) {
+    return false;
+  }
+
+  return allowedRoles.includes(userRole);
 }
 
-export const getUserRoleName = () => {
-  return localStorage.getItem('userRole')
-}
+export const getUserRoleName = (): Role | '' => {
+  return (localStorage.getItem('userRole') as Role) || '';
+};

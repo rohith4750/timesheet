@@ -7,11 +7,13 @@ interface LoginResponse {
   success: boolean;
   token?: string;
   message?: string;
+  role?: string;
 }
 
 interface ApiLoginResponse {
   accessToken: string;
   refreshToken: string;
+  role?: string;
 }
 
 export const loginUser = async (
@@ -32,15 +34,26 @@ export const loginUser = async (
     }
 
     const data: ApiLoginResponse = await response.json();
-    localStorage.setItem('auth_token', JSON.stringify({
+    
+    // Store the token with expiration
+    const tokenData = {
       accessToken: data.accessToken,
       refreshToken: data.refreshToken,
       expiresIn: Date.now() + (24 * 60 * 60 * 1000) // 24 hours from now
-    }));
+    };
+    
+    localStorage.setItem('auth_token', JSON.stringify(tokenData));
     localStorage.setItem('isLogin', 'true');
+    
+    // Store user role if provided
+    if (data.role) {
+      localStorage.setItem('userRole', data.role);
+    }
+
     return {
       success: true,
       token: data.accessToken,
+      role: data.role
     };
   } catch (error) {
     return {

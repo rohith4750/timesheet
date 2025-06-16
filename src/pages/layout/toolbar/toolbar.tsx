@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import "./toolbar.scss";
 import dropDown from "../../../assets/icons/DropDownIcon-xs.svg";
-import profile from "../../../assets/icons/profile.svg";
+import profile from "../../../assets/images/profile.svg";
 import { useAuth } from "../../../services/auth";
 import { useNavigate } from "react-router-dom";
 // import Alerts from "../../toast/toast";
-import downArrow from "../../../assets/icons/DropDownIcon-xs.svg"
+import downArrow from "../../../assets/images/down-arrow.svg"
+import { getUserRoleName } from "../../../hooks/permissionAccess";
+
 interface Alert {
   type: "error" | "warning" | "success" | "info";
   text: string;
@@ -23,6 +25,7 @@ const Toolbar: React.FC<ToolbarProps> = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const { logout, user } = useAuth();
+  const userRole = getUserRoleName();
 
   const handleProfileClick = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -42,7 +45,7 @@ const Toolbar: React.FC<ToolbarProps> = () => {
           <img src={profile} alt="Profile Icon" className="profile-icon" />
           <div className="user-info">
             <span className="user-name">{user?.username || 'User'}</span>
-            <span className="user-role">System Admin</span>
+            <span className="user-role">{userRole}</span>
           </div>
           <img
             src={downArrow}

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TableComponent from "../../../components/table/table";
 import { permissionAccess } from "../../../hooks/permissionAccess";
@@ -9,6 +9,8 @@ import {
   deleteTask,
   TaskData as ApiTaskData,
 } from "../../../api/taskApi";
+import { Permission } from "../../../constants/permissions";
+
 type TaskData = Omit<ApiTaskData, "id"> & { id?: string };
 
 interface FilterParams {
@@ -17,6 +19,8 @@ interface FilterParams {
 
 const ProjectList = () => {
   const navigate = useNavigate();
+  const [data, setData] = useState<TaskData[]>([]);
+  const [filteredData, setFilteredData] = useState<TaskData[]>([]);
 
   const columns = [
     {
@@ -61,13 +65,13 @@ const ProjectList = () => {
       const limit = 10;
       const response = await getTasks(page, limit);
 
-      let filteredData = response.data;
+      let filteredData = response.task || [];
 
       // Apply filters if they exist
       if (params.filters) {
         Object.entries(params.filters).forEach(([key, value]) => {
-          if (value && key in (filteredData[0] || {})) {
-            filteredData = filteredData.filter((item) => {
+          if (value && filteredData.length > 0 && key in filteredData[0]) {
+            filteredData = filteredData.filter((item: TaskData) => {
               const itemValue = item[key as keyof TaskData];
               if (typeof itemValue !== "string") return false;
               if (key === "task_start_at") {
@@ -79,9 +83,10 @@ const ProjectList = () => {
         });
       }
 
+      setData(filteredData);
       return {
         data: filteredData,
-        total: response.total,
+        total: response.total || 0,
       };
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -107,16 +112,29 @@ const ProjectList = () => {
     }
   };
 
+  const handleFilter = (params: FilterParams) => {
+    let newFilteredData = [...data];
+    if (params.filters) {
+      Object.entries(params.filters).forEach(([key, value]) => {
+        if (value && newFilteredData.length > 0 && key in newFilteredData[0]) {
+          newFilteredData = newFilteredData.filter((item: TaskData) => {
+            const itemValue = item[key as keyof TaskData];
+            if (typeof itemValue !== "string") return false;
+            if (key === "task_start_at") {
+              return itemValue.toLowerCase().includes(value.toLowerCase());
+            }
+            return itemValue.toLowerCase().includes(value.toLowerCase());
+          });
+        }
+      });
+    }
+    setFilteredData(newFilteredData);
+  };
+
   return (
     <div className="task-list-container">
       <div className="task-list-header">
-        {permissionAccess("CREATE_TASK") && (
-          // <button
-          //   className="add-task-button"
-          //   onClick={() => navigate('/task/add')}
-          // >
-          //   Add Task
-          // </button>
+        {permissionAccess("CREATE_TASK" as Permission) && (
           <Button
             type="submit"
             variant="primary"

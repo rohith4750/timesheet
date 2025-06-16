@@ -8,6 +8,7 @@ import { useToast } from "../../components/toast/ToastContext";
 import "./login.scss";
 import logo from "../../assets/icons/pycube-logo.svg";
 import design from "../../assets/icons/timesheet-login.svg";
+
 interface LoginFormData {
   user_email: string;
   password: string;
@@ -49,24 +50,33 @@ const Login: React.FC = () => {
 
     if (validateForm()) {
       try {
-        await login(formData.user_email, formData.password);
-        showToast({
-          type: "success",
-          message: "Login successful!",
-          duration: 2000
-        });
-        setTimeout(() => {
-          navigate("/home-page");
-        }, 2000);
-      } catch (error) {
-          console.error("Login failed:", error);
+        const response = await loginUser(formData);
+        if (response.success && response.token) {
+          // Store user role (you should get this from your API response)
+          localStorage.setItem('userRole', 'ADMIN'); // or whatever role the user has
+          
+          // Call the login function from auth context
+          await login(response.token, { role: 'ADMIN' }); // Pass the role here
+          
           showToast({
-            type: "error",
-            message: "Login failed. Please check your credentials.",
-            duration: 5000
+            type: "success",
+            message: "Login successful!",
+            duration: 2000
           });
+          
+          // Navigate after successful login
+          navigate("/home-page");
+        } else {
+          throw new Error(response.message || "Login failed");
+        }
+      } catch (error) {
+        console.error("Login failed:", error);
+        showToast({
+          type: "error",
+          message: "Login failed. Please check your credentials.",
+          duration: 5000
+        });
       }
-      
     }
   };
 

@@ -2,13 +2,15 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import "./sidemenu.scss";
 import Logo from "../../../assets/images/pycube-logo-background.svg";
-import { menuItems } from "../../../constants/menu";
+import { getMenuItemsByRole, isMenuItemVisible } from "../../../constants/menu";
 
 interface SideMenuProps {
     onClose?: () => void;
 }
 
 const SideMenu: React.FC<SideMenuProps> = ({ onClose }) => {
+    const menuItems = getMenuItemsByRole();
+
     return (
         <div className="side-menu">
             <div className="logo">
@@ -16,7 +18,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ onClose }) => {
                 <div className="divider-menu" />
             </div>
             <ul>
-                {menuItems.map((item) => (
+                {menuItems.filter(isMenuItemVisible).map((item) => (
                     <li key={item.path}>
                         <NavLink
                             to={item.path}

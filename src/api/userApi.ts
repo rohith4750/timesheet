@@ -1,4 +1,4 @@
-import { api } from './config';
+import { api, handleApiError } from './config';
 
 export interface UserData {
   user_sno: number;
@@ -28,13 +28,13 @@ interface UserListResponse {
 // Get all users
 export const getUsers = async (page: number = 1, limit: number = 10): Promise<UserListResponse> => {
   try {
-    const response = await api.get<UserListResponse>(`/list/users`, {
+    const response = await api.get<UserListResponse>('/list/users', {
       params: { page, limit }
     });
     return response.data;
   } catch (error) {
     console.error('Error fetching users:', error);
-    throw error;
+    throw new Error(handleApiError(error));
   }
 };
 
@@ -57,9 +57,14 @@ export const updateUser = async (userId: number, userData: Partial<UserData>): P
 };
 
 // Delete user
-export const deleteUser = async (userId: number): Promise<UserResponse> => {
-  const response = await api.delete<UserResponse>(`/delete/user/${userId}`);
-  return response.data;
+export const deleteUser = async (userSno: number): Promise<{ message: string }> => {
+  try {
+    const response = await api.delete<{ message: string }>(`/delete/user/${userSno}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    throw new Error(handleApiError(error));
+  }
 };
 
 // Get logged-in user details
@@ -110,16 +115,8 @@ export const fetchUser = async (): Promise<UserResponse> => {
       throw new Error('Invalid response format from server');
     }
     return response.data;
-  } catch (error: any) {
-    if (error?.response) {
-      const message = error.response.data?.message || 'Failed to fetch user data';
-      console.error('API Error:', message);
-      throw new Error(message);
-    } else if (error?.request) {
-      console.error('Network Error: No response received');
-      throw new Error('No response received from server');
-    }
-    console.error('Error:', error?.message || 'Unknown error');
-    throw new Error(error?.message || 'Failed to load user data');
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    throw new Error(handleApiError(error));
   }
 }; 

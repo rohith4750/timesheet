@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../services/auth";
 import { changePassword } from "../../api/passwordApi";
-import { fetchUser, UserData } from "../../api/userapi";
+import { fetchUser, UserData, updateProfile } from "../../api/userApi";
 import InputField from "../../components/input-component/input-component";
 import { profileFormConfig, passwordFormConfig } from "./profile-config";
 import { useToast } from "../../components/toast/ToastContext";
+import Button from "../../components/button/button";
+import { useNavigate } from "react-router-dom";
 import "./profile.scss";
 
 interface ProfileFormData {
@@ -24,33 +26,36 @@ interface PasswordFormData {
 const Profile: React.FC = () => {
   const { user } = useAuth();
   const { showToast } = useToast();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const loadUserData = async () => {
       try {
         const response = await fetchUser();
-        if (response.data) {
-          setUserData(response.data);
+        if (response.userDetails) {
+          setUserData(response.userDetails);
           setFormData({
-            firstName: response.data.user_name.split(' ')[0] || '',
-            lastName: response.data.user_name.split(' ')[1] || '',
-            email: response.data.user_email || '',
-            phoneNumber: response.data.user_phone || ''
+            firstName: response.userDetails.user_firstname || '',
+            lastName: response.userDetails.user_lastname || '',
+            email: response.userDetails.user_email || '',
+            phoneNumber: response.userDetails.user_phone || ''
           });
         }
       } catch (error: any) {
         showToast({
           type: "error",
           message: error.message || "Failed to load user data",
-          duration: 3000
+          duration: 3000,
         });
       }
     };
+
     loadUserData();
   }, []);
 
@@ -66,37 +71,6 @@ const Profile: React.FC = () => {
     newPassword: "",
     confirmPassword: "",
   });
-
-  // useEffect(() => {
-  //   const initializeProfile = async () => {
-  //     try {
-  //       const [adminStatus, userProfile] = await Promise.all([
-  //         checkIsSuperAdmin(),
-  //         fetchUserProfile(),
-  //       ]);
-
-  //       setIsSuperAdmin(adminStatus);
-
-  //       // Split the user_name into first and last name
-  //       const [firstName = "", lastName = ""] =
-  //         userProfile.user_name.split(" ");
-
-  //       setFormData({
-  //         firstName,
-  //         lastName,
-  //         email: userProfile.email,
-  //         phoneNumber: userProfile.user_phone,
-  //       });
-
-  //       setLoading(false);
-  //     } catch (err) {
-  //       setError("Failed to load profile data");
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   initializeProfile();
-  // }, []);
 
   const handleInputChange = (field: keyof ProfileFormData, value: string) => {
     setFormData((prev) => ({
@@ -115,30 +89,57 @@ const Profile: React.FC = () => {
     }));
   };
 
-  // const handleProfileSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setError("");
+  const handleProfileSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userData) return;
 
-  //   try {
-  //     const userProfile = await fetchUserProfile();
-  //     const userData = {
-  //       user_sno: userProfile.user_sno,
-  //       user_name: `${formData.firstName} ${formData.lastName}`.trim(),
-  //       user_phone: formData.phoneNumber,
-  //       ...(isSuperAdmin && { user_id: userProfile.user_id }),
-  //     };
+    try {
+      const response = await fetch(`http://localhost:3001/api/profile/${userData.user_sno}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          user_firstname: formData.firstName,
+          user_lastname: formData.lastName,
+          user_phone: formData.phoneNumber,
+          user_email: formData.email,
+          user_fullname: `${formData.firstName} ${formData.lastName}`,
+          emp_id: userData.emp_id,
+          role: userData.role
+        })
+      });
 
-  //     if (isSuperAdmin) {
-  //       await updateSuperAdminProfile(userData as any);
-  //     } else {
-  //       await updateUserProfile(userData);
-  //     }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update profile');
+      }
 
-  //     setError("Profile updated successfully");
-  //   } catch (err) {
-  //     setError("Failed to update profile");
-  //   }
-  // };
+      const responseData = await response.json();
+      if (responseData.userDetails) {
+        setUserData(responseData.userDetails);
+        setIsEditing(false);
+        showToast({
+          type: "success",
+          message: "Profile updated successfully. Please login again.",
+          duration: 2000
+        });
+        
+        // Clear local storage and navigate to login
+        localStorage.removeItem('token');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      }
+    } catch (error: any) {
+      showToast({
+        type: "error",
+        message: error.message || "Failed to update profile",
+        duration: 3000
+      });
+    }
+  };
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,10 +180,6 @@ const Profile: React.FC = () => {
     }
   };
 
-  // if (loading) {
-  //   return <div className="profile-page">Loading...</div>;
-  // }
-
   return (
     <div className="profile-page">
       <div className="profile-header">
@@ -192,16 +189,19 @@ const Profile: React.FC = () => {
               type="file"
               id="profile-image-upload"
               accept="image/*"
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
                   // TODO: Implement image upload API call here
-                  console.log('Image selected:', file);
+                  console.log("Image selected:", file);
                 }
               }}
             />
-            <label htmlFor="profile-image-upload" className="profile-image-label">
+            <label
+              htmlFor="profile-image-upload"
+              className="profile-image-label"
+            >
               {/* <img
                 src={formData.profileImage || '/default-avatar.png'}
                 alt="Profile"
@@ -213,14 +213,69 @@ const Profile: React.FC = () => {
             </label>
           </div>
           <div className="profile-details">
-            <h2>
-              {formData.firstName} {formData.lastName}
-            </h2>
-            <span className="role">
-              {isSuperAdmin ? "Super Admin" : "User"}
-            </span>
+            {isEditing ? (
+              <form onSubmit={handleProfileSubmit} className="edit-profile-form">
+                <div className="form-group">
+                  <InputField
+                    label="First Name"
+                    value={formData.firstName}
+                    onChange={(value) => handleInputChange("firstName", value as string)}
+                  />
+                </div>
+                <div className="form-group">
+                  <InputField
+                    label="Last Name"
+                    value={formData.lastName}
+                    onChange={(value) => handleInputChange("lastName", value as string)}
+                  />
+                </div>
+                <div className="form-group">
+                  <InputField
+                    label="Phone Number"
+                    value={formData.phoneNumber}
+                    onChange={(value) => handleInputChange("phoneNumber", value as string)}
+                  />
+                </div>
+                <div className="form-actions">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setIsEditing(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                  >
+                    Save Changes
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <h2>
+                  {formData.firstName} {formData.lastName}
+                </h2>
+                <span className="role">
+                  {isSuperAdmin ? "Super Admin" : "User"}
+                </span>
+              </>
+            )}
           </div>
         </div>
+        {!isEditing && (
+          <div className="profile-actions">
+            <Button
+              type="button"
+              variant="primary"
+              size="small"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit Profile
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="profile-tabs">
@@ -246,12 +301,20 @@ const Profile: React.FC = () => {
             {userData ? (
               <>
                 <div className="overview-item">
-                  <h3>User ID</h3>
-                  <p>{userData.user_id}</p>
+                  <h3>Employee ID</h3>
+                  <p>{userData.emp_id}</p>
                 </div>
                 <div className="overview-item">
-                  <h3>Name</h3>
-                  <p>{userData.user_name}</p>
+                  <h3>First Name</h3>
+                  <p>{userData.user_firstname}</p>
+                </div>
+                <div className="overview-item">
+                  <h3>Middle Name</h3>
+                  <p>{userData.user_middlename}</p>
+                </div>
+                <div className="overview-item">
+                  <h3>Last Name</h3>
+                  <p>{userData.user_lastname}</p>
                 </div>
                 <div className="overview-item">
                   <h3>Email</h3>

@@ -1,40 +1,76 @@
-import { api } from './config';
+import { api, handleApiError } from './config';
 
 export interface ProjectData {
   project_sno: number;
   project_name: string;
-  project_description?: string;
-  start_date?: string;
-  end_date?: string;
-  status?: string;
-  created_by?: number;
-  created_at?: string;
-  updated_at?: string;
+  project_description: string;
+  project_status: string;
+  project_manager: number;
+  created_by: number;
+  updated_by: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectFormData {
+  project_name: string;
+  project_description: string;
+  project_status: string;
+  project_manager: number;
 }
 
 export interface ProjectResponse {
-  message: string;
-  data?: ProjectData;
-  project?: ProjectData[];
-  total?: number;
+  projects: ProjectData[];
+  total: number;
+  message?: string;
 }
 
 // Get all projects
 export const getProjects = async (page: number = 1, limit: number = 10): Promise<ProjectResponse> => {
-  const response = await api.get<ProjectResponse>(`/list/projects?page=${page}&limit=${limit}`);
-  return response.data;
+  try {
+    const response = await api.get<ProjectResponse>(`/list/projects`, {
+      params: { page, limit }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+    throw new Error(handleApiError(error));
+  }
 };
 
-// Get project by ID
-export const getProjectById = async (projectId: number): Promise<ProjectResponse> => {
-  const response = await api.get<ProjectResponse>(`/project/${projectId}`);
-  return response.data;
+// Get user projects
+export const getUserProjects = async (page: number = 1, limit: number = 10): Promise<ProjectResponse> => {
+  try {
+    const response = await api.get<ProjectResponse>(`/list/user-projects`, {
+      params: { page, limit }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user projects:', error);
+    throw new Error(handleApiError(error));
+  }
 };
 
-// Create new project
-export const createProject = async (projectData: Omit<ProjectData, 'project_sno'>): Promise<ProjectResponse> => {
-  const response = await api.post<ProjectResponse>('/create/project', projectData);
-  return response.data;
+// Get project details
+export const getProjectDetails = async (projectSno: number): Promise<ProjectData> => {
+  try {
+    const response = await api.get<ProjectData>(`/project/${projectSno}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching project details:', error);
+    throw new Error(handleApiError(error));
+  }
+};
+
+// Create project
+export const createProject = async (formData: ProjectFormData): Promise<ProjectData> => {
+  try {
+    const response = await api.post<ProjectData>('/create/project', formData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating project:', error);
+    throw new Error(handleApiError(error));
+  }
 };
 
 // Update project
@@ -44,9 +80,13 @@ export const updateProject = async (projectId: number, projectData: Partial<Proj
 };
 
 // Delete project
-export const deleteProject = async (projectId: number): Promise<ProjectResponse> => {
-  const response = await api.delete<ProjectResponse>(`/delete/project/${projectId}`);
-  return response.data;
+export const deleteProject = async (projectSno: number): Promise<void> => {
+  try {
+    await api.delete(`/delete/project/${projectSno}`);
+  } catch (error) {
+    console.error('Error deleting project:', error);
+    throw new Error(handleApiError(error));
+  }
 };
 
 // Get projects by user ID

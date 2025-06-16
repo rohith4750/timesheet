@@ -4,7 +4,7 @@ import ReusableForm from "../../../components/reusable-form/reusableform";
 import { useToast } from "../../../components/toast/ToastContext";
 import { permissionAccess } from "../../../hooks/permissionAccess";
 import { PERMISSIONS } from "../../../constants/permissions";
-import { createTask, TaskData } from "../../../api/taskApi";
+import { createTask, TaskData, TaskCreateResponse } from "../../../api/taskApi";
 import { getUsers, UserData } from "../../../api/userApi";
 import { getProjects, ProjectData } from "../../../api/projectApi";
 import "./add-task.scss";
@@ -37,7 +37,7 @@ const AddTask: React.FC = () => {
         setUsers(usersResponse.users || []);
 
         // Map ProjectData to Project interface
-        const mappedProjects: Project[] = (projectsResponse.project || []).map(project => ({
+        const mappedProjects: Project[] = (projectsResponse.projects || []).map((project: ProjectData) => ({
           project_sno: project.project_sno,
           project_name: project.project_name
         }));
@@ -101,12 +101,11 @@ const AddTask: React.FC = () => {
       name: "status",
       required: true,
       options: [
-        { value: "draft", label: "Draft" },
-        { value: "pending", label: "Pending" },
-        { value: "approved", label: "Approved" },
-        { value: "rejected", label: "Rejected" },
+        { value: "PENDING", label: "Pending" },
+        { value: "IN_PROGRESS", label: "In Progress" },
+        { value: "COMPLETED", label: "Completed" },
       ],
-      defaultValue: "draft",
+      defaultValue: "PENDING",
     },
     {
       label: "Number of Hours",
@@ -149,7 +148,7 @@ const AddTask: React.FC = () => {
       
       showToast({
         type: "success",
-        message: response.message || "Task created successfully!",
+        message: response.message,
         duration: 2000
       });
 

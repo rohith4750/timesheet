@@ -2,17 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReusableForm from "../../../components/reusable-form/reusableform";
 import { useToast } from "../../../components/toast/ToastContext";
-import { createProject } from "../../../api/projectApi";
+import { createProject, ProjectData } from "../../../api/projectApi";
 import { getUsers, UserData } from "../../../api/userApi";
 import "./add-project.scss";
 
-interface TaskFormData {
+interface ProjectFormData {
   project_name: string;
   project_description: string;
-  project_manager: string;
-  start_date: string;
-  end_date: string;
-  status: string;
+  project_manager: number;
+  project_status: string;
 }
 
 const AddProject: React.FC = () => {
@@ -58,7 +56,7 @@ const AddProject: React.FC = () => {
       name: "project_manager",
       required: true,
       placeholder: "Select project manager",
-      options: managers, // Dropdown options from API
+      options: managers,
     },
     {
       label: "Description",
@@ -68,6 +66,19 @@ const AddProject: React.FC = () => {
       required: true,
       placeholder: "Enter project description",
     },
+    {
+      label: "Status",
+      Key: "project_status",
+      type: "select",
+      name: "project_status",
+      required: true,
+      placeholder: "Select project status",
+      options: [
+        { label: "Active", value: "ACTIVE" },
+        { label: "Inactive", value: "INACTIVE" },
+        { label: "Completed", value: "COMPLETED" },
+      ],
+    },
   ];
 
   const formConfig = {
@@ -76,9 +87,12 @@ const AddProject: React.FC = () => {
     cancelButtonText: "Cancel",
   };
 
-  const handleSubmit = async (formData: TaskFormData) => {
+  const handleSubmit = async (formData: ProjectFormData) => {
     try {
-      await createProject(formData);
+      await createProject({
+        ...formData,
+        project_manager: Number(formData.project_manager),
+      });
 
       showToast({
         type: "success",
@@ -87,7 +101,7 @@ const AddProject: React.FC = () => {
       });
 
       setTimeout(() => {
-        navigate("/task");
+        navigate("/project");
       }, 2000);
     } catch (error) {
       console.error("Error creating project:", error);
@@ -100,7 +114,7 @@ const AddProject: React.FC = () => {
   };
 
   return (
-    <div className="add-task-container">
+    <div className="add-project-container">
       <ReusableForm
         fields={formFields}
         onSubmit={handleSubmit}

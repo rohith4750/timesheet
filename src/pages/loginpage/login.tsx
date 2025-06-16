@@ -64,8 +64,10 @@ const Login: React.FC = () => {
             duration: 2000
           });
           
-          // Navigate after successful login
-          navigate("/home-page");
+          // Add a small delay to ensure state updates are complete
+          setTimeout(() => {
+            navigate("/home-page", { replace: true });
+          }, 100);
         } else {
           throw new Error(response.message || "Login failed");
         }

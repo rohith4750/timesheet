@@ -12,6 +12,7 @@ import {
 } from "../../api/userApi";
 import axios from "axios";
 import "./userlist.scss";
+import { PERMISSIONS } from "../../constants/permissions";
 
 interface UserListApiResponse {
   data: UserData[];
@@ -177,9 +178,11 @@ const UserList = () => {
   return (
     <div className="user-list-container">
       <div className="user-list-header">
-        <Button variant="primary" onClick={() => navigate("/user/add")}>
-          Add User
-        </Button>
+        {permissionAccess(PERMISSIONS.CREATE_USER) && (
+          <Button variant="primary" onClick={() => navigate("/user/add")}>
+            Add User
+          </Button>
+        )}
       </div>
 
       <TableComponent

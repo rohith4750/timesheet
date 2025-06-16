@@ -5,7 +5,7 @@ import profile from "../../../assets/images/profile.svg";
 import { useAuth } from "../../../services/auth";
 import { useNavigate } from "react-router-dom";
 // import Alerts from "../../toast/toast";
-import downArrow from "../../../assets/images/down-arrow.svg"
+import downArrow from "../../../assets/images/down-arrow.svg";
 import { getUserRoleName } from "../../../hooks/permissionAccess";
 
 interface Alert {
@@ -44,7 +44,7 @@ const Toolbar: React.FC<ToolbarProps> = () => {
         <div className="profile-container" onClick={handleProfileClick}>
           <img src={profile} alt="Profile Icon" className="profile-icon" />
           <div className="user-info">
-            <span className="user-name">{user?.username || 'User'}</span>
+            <span className="user-name">{user?.user_firstname}</span>
             <span className="user-role">{userRole}</span>
           </div>
           <img

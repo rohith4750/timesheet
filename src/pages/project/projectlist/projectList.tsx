@@ -1,80 +1,113 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TableComponent from "../../../components/table/table";
 import { permissionAccess } from "../../../hooks/permissionAccess";
 import "./projectlist.scss";
 import Button from "../../../components/button/button";
 import {
-  getTasks,
-  deleteTask,
-  TaskData as ApiTaskData,
-} from "../../../api/taskApi";
-import { Permission } from "../../../constants/permissions";
-
-type TaskData = Omit<ApiTaskData, "id"> & { id?: string };
+  getProjects,
+  deleteProject,
+  ProjectData,
+} from "../../../api/projectApi";
+import { Permission, PERMISSIONS } from "../../../constants/permissions";
+import { useToast } from "../../../components/toast/ToastContext";
 
 interface FilterParams {
-  filters?: Record<keyof TaskData, string>;
+  filters?: Record<keyof ProjectData, string>;
 }
 
 const ProjectList = () => {
   const navigate = useNavigate();
-  const [data, setData] = useState<TaskData[]>([]);
-  const [filteredData, setFilteredData] = useState<TaskData[]>([]);
+  const { showToast } = useToast();
+  const [data, setData] = useState<ProjectData[]>([]);
+  const [filteredData, setFilteredData] = useState<ProjectData[]>([]);
+  const [hasViewPermission, setHasViewPermission] = useState(false);
+
+  useEffect(() => {
+    const checkPermission = () => {
+      const canView = permissionAccess(PERMISSIONS.VIEW_PROJECT as Permission);
+      setHasViewPermission(canView);
+      if (!canView) {
+        showToast({
+          type: "error",
+          message: "You don't have permission to view projects",
+          duration: 5000,
+        });
+        navigate("/dashboard");
+      }
+    };
+    checkPermission();
+  }, [navigate, showToast]);
 
   const columns = [
     {
       sortable: true,
-      key: "task",
-      label: "Task Name",
-      field: "task",
+      key: "project_name",
+      label: "Project Name",
+      field: "project_name",
       filterType: "text",
     },
     {
       sortable: true,
-      key: "task_description",
+      key: "project_description",
       label: "Description",
-      field: "task_description",
+      field: "project_description",
       filterType: "text",
     },
     {
       sortable: true,
-      key: "ut_status",
+      key: "project_status",
       label: "Status",
-      field: "ut_status",
+      field: "project_status",
       filterType: "select",
       filterOptions: [
-        { value: "pending", label: "Pending" },
-        { value: "approved", label: "Approved" },
-        { value: "in_progress", label: "In Progress" },
-        { value: "completed", label: "Completed" },
+        { value: "ACTIVE", label: "Active" },
+        { value: "INACTIVE", label: "Inactive" },
+        { value: "COMPLETED", label: "Completed" },
       ],
     },
     {
       sortable: true,
-      key: "task_start_at",
-      label: "Start Date",
-      field: "task_start_at",
+      key: "created_at",
+      label: "Created Date",
+      field: "created_at",
       filterType: "date",
     },
   ];
 
   const fetchData = useCallback(async (params: FilterParams) => {
+    if (!hasViewPermission) {
+      return {
+        data: [],
+        total: 0,
+      };
+    }
+
     try {
       const page = 1; // TODO: Implement pagination
       const limit = 10;
-      const response = await getTasks(page, limit);
+      const response = await getProjects(page, limit);
+      console.log('API Response:', response); // Debug log
 
-      let filteredData = response.task || [];
+      if (!response || !response.projects) {
+        console.error('Invalid response format:', response);
+        return {
+          data: [],
+          total: 0,
+        };
+      }
+
+      let filteredData = response.projects;
+      console.log('Initial filtered data:', filteredData); // Debug log
 
       // Apply filters if they exist
       if (params.filters) {
         Object.entries(params.filters).forEach(([key, value]) => {
           if (value && filteredData.length > 0 && key in filteredData[0]) {
-            filteredData = filteredData.filter((item: TaskData) => {
-              const itemValue = item[key as keyof TaskData];
+            filteredData = filteredData.filter((item: ProjectData) => {
+              const itemValue = item[key as keyof ProjectData];
               if (typeof itemValue !== "string") return false;
-              if (key === "task_start_at") {
+              if (key === "created_at") {
                 return itemValue.includes(value);
               }
               return itemValue.toLowerCase().includes(value.toLowerCase());
@@ -83,32 +116,57 @@ const ProjectList = () => {
         });
       }
 
+      console.log('Final filtered data:', filteredData); // Debug log
       setData(filteredData);
+      setFilteredData(filteredData);
+
       return {
         data: filteredData,
-        total: response.total || 0,
+        total: response.total || filteredData.length,
       };
     } catch (error) {
-      console.error("Error fetching tasks:", error);
+      console.error("Error fetching projects:", error);
+      showToast({
+        type: "error",
+        message: "Failed to fetch projects. Please try again.",
+        duration: 5000,
+      });
       return {
         data: [],
         total: 0,
       };
     }
-  }, []);
+  }, [hasViewPermission, showToast]);
 
-  const handleEdit = (item: TaskData) => {
-    navigate(`/project/edit/${item.id}`);
+  const handleEdit = (item: ProjectData) => {
+    if (!permissionAccess(PERMISSIONS.EDIT_PROJECT as Permission)) {
+      showToast({
+        type: "error",
+        message: "You don't have permission to edit projects",
+        duration: 5000,
+      });
+      return;
+    }
+    navigate(`/project/edit/${item.project_sno}`);
   };
 
-  const handleDelete = async (item: TaskData): Promise<{ message: string }> => {
+  const handleDelete = async (item: ProjectData): Promise<{ message: string }> => {
+    if (!permissionAccess(PERMISSIONS.DELETE_PROJECT as Permission)) {
+      showToast({
+        type: "error",
+        message: "You don't have permission to delete projects",
+        duration: 5000,
+      });
+      throw new Error("Permission denied");
+    }
+
     try {
-      if (!item.id) throw new Error("Task ID is required");
-      await deleteTask(Number(item.id));
-      return { message: "Task deleted successfully" };
+      if (!item.project_sno) throw new Error("Project ID is required");
+      await deleteProject(Number(item.project_sno));
+      return { message: "Project deleted successfully" };
     } catch (error) {
-      console.error("Error deleting task:", error);
-      throw new Error("Failed to delete task");
+      console.error("Error deleting project:", error);
+      throw new Error("Failed to delete project");
     }
   };
 
@@ -117,10 +175,10 @@ const ProjectList = () => {
     if (params.filters) {
       Object.entries(params.filters).forEach(([key, value]) => {
         if (value && newFilteredData.length > 0 && key in newFilteredData[0]) {
-          newFilteredData = newFilteredData.filter((item: TaskData) => {
-            const itemValue = item[key as keyof TaskData];
+          newFilteredData = newFilteredData.filter((item: ProjectData) => {
+            const itemValue = item[key as keyof ProjectData];
             if (typeof itemValue !== "string") return false;
-            if (key === "task_start_at") {
+            if (key === "created_at") {
               return itemValue.toLowerCase().includes(value.toLowerCase());
             }
             return itemValue.toLowerCase().includes(value.toLowerCase());
@@ -131,10 +189,14 @@ const ProjectList = () => {
     setFilteredData(newFilteredData);
   };
 
+  if (!hasViewPermission) {
+    return null;
+  }
+
   return (
-    <div className="task-list-container">
-      <div className="task-list-header">
-        {permissionAccess("CREATE_TASK" as Permission) && (
+    <div className="project-list-container">
+      <div className="project-list-header">
+        {permissionAccess(PERMISSIONS.CREATE_PROJECT as Permission) && (
           <Button
             type="submit"
             variant="primary"
@@ -152,12 +214,12 @@ const ProjectList = () => {
         onEdit={handleEdit}
         onDelete={handleDelete}
         heading="Project"
-        textkey="task"
+        textkey="project_name"
         navKey={true}
-        createPermission="CREATE_TASK"
-        deletePermission="DELETE_TASK"
-        updatePermission="UPDATE_TASK"
-        dataKey="tasks"
+        createPermission={PERMISSIONS.CREATE_PROJECT}
+        deletePermission={PERMISSIONS.DELETE_PROJECT}
+        updatePermission={PERMISSIONS.EDIT_PROJECT}
+        dataKey="projects"
       />
     </div>
   );

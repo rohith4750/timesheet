@@ -8,6 +8,7 @@ export const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 second timeout
 });
 
 // Request interceptor for adding auth token
@@ -63,6 +64,12 @@ api.interceptors.response.use(
         default:
           console.error('An error occurred');
       }
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error('No response received from server');
+    } else {
+      // Something happened in setting up the request
+      console.error('Error setting up request:', error.message);
     }
     return Promise.reject(error);
   }

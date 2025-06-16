@@ -6,13 +6,11 @@ import { useToast } from "../../components/toast/ToastContext";
 import "./tasklist.scss";
 import Button from "../../components/button/button";
 import {
-  getTasks,
+  getUserTasks,
   deleteTask,
-  TaskData as ApiTaskData,
+  TaskData,
 } from "../../api/taskApi";
-import { Permission } from "../../constants/permissions";
-
-type TaskData = Omit<ApiTaskData, "id"> & { id?: string };
+import { Permission, PERMISSIONS } from "../../constants/permissions";
 
 interface FilterParams {
   filters?: Record<keyof TaskData, string>;
@@ -23,23 +21,30 @@ const TaskList = () => {
   const { showToast } = useToast();
   const [data, setData] = useState<TaskData[]>([]);
   const [filteredData, setFilteredData] = useState<TaskData[]>([]);
+  const [hasViewPermission, setHasViewPermission] = useState(false);
 
   useEffect(() => {
-    // Debug logs
-    const userRole = localStorage.getItem("userRole");
-    console.log("Current user role:", userRole);
-    console.log(
-      "Has CREATE_TASK permission:",
-      permissionAccess("create_task" as Permission)
-    );
-  }, []);
+    const checkPermission = () => {
+      const canView = permissionAccess(PERMISSIONS.VIEW_TASK as Permission);
+      setHasViewPermission(canView);
+      if (!canView) {
+        showToast({
+          type: "error",
+          message: "You don't have permission to view tasks",
+          duration: 5000,
+        });
+        navigate("/dashboard");
+      }
+    };
+    checkPermission();
+  }, [navigate, showToast]);
 
   const columns = [
     {
       sortable: true,
-      key: "task",
+      key: "task_name",
       label: "Task Name",
-      field: "task",
+      field: "task_name",
       filterType: "text",
     },
     {
@@ -51,33 +56,49 @@ const TaskList = () => {
     },
     {
       sortable: true,
-      key: "ut_status",
+      key: "status",
       label: "Status",
-      field: "ut_status",
+      field: "status",
       filterType: "select",
       filterOptions: [
-        { value: "pending", label: "Pending" },
-        { value: "approved", label: "Approved" },
-        { value: "in_progress", label: "In Progress" },
-        { value: "completed", label: "Completed" },
+        { value: "PENDING", label: "Pending" },
+        { value: "IN_PROGRESS", label: "In Progress" },
+        { value: "COMPLETED", label: "Completed" },
       ],
     },
     {
       sortable: true,
-      key: "task_start_at",
+      key: "start_date",
       label: "Start Date",
-      field: "task_start_at",
+      field: "start_date",
       filterType: "date",
     },
   ];
 
   const fetchData = useCallback(async (params: FilterParams) => {
+    if (!hasViewPermission) {
+      return {
+        data: [],
+        total: 0,
+      };
+    }
+
     try {
       const page = 1; // TODO: Implement pagination
       const limit = 10;
-      const response = await getTasks(page, limit);
+      const response = await getUserTasks(page, limit);
+      console.log('API Response:', response); // Debug log
 
-      let filteredData = response.task || [];
+      if (!response || !response.tasks) {
+        console.error('Invalid response format:', response);
+        return {
+          data: [],
+          total: 0,
+        };
+      }
+
+      let filteredData = response.tasks;
+      console.log('Initial filtered data:', filteredData); // Debug log
 
       // Apply filters if they exist
       if (params.filters) {
@@ -86,7 +107,7 @@ const TaskList = () => {
             filteredData = filteredData.filter((item: TaskData) => {
               const itemValue = item[key as keyof TaskData];
               if (typeof itemValue !== "string") return false;
-              if (key === "task_start_at") {
+              if (key === "start_date") {
                 return itemValue.includes(value);
               }
               return itemValue.toLowerCase().includes(value.toLowerCase());
@@ -95,19 +116,27 @@ const TaskList = () => {
         });
       }
 
+      console.log('Final filtered data:', filteredData); // Debug log
       setData(filteredData);
+      setFilteredData(filteredData);
+
       return {
         data: filteredData,
-        total: response.total || 0,
+        total: response.total || filteredData.length,
       };
     } catch (error) {
       console.error("Error fetching tasks:", error);
+      showToast({
+        type: "error",
+        message: "Failed to fetch tasks. Please try again.",
+        duration: 5000,
+      });
       return {
         data: [],
         total: 0,
       };
     }
-  }, []);
+  }, [hasViewPermission, showToast]);
 
   const handleFilter = (params: FilterParams) => {
     let newFilteredData = [...data];
@@ -117,7 +146,7 @@ const TaskList = () => {
           newFilteredData = newFilteredData.filter((item: TaskData) => {
             const itemValue = item[key as keyof TaskData];
             if (typeof itemValue !== "string") return false;
-            if (key === "task_start_at") {
+            if (key === "start_date") {
               return itemValue.toLowerCase().includes(value.toLowerCase());
             }
             return itemValue.toLowerCase().includes(value.toLowerCase());
@@ -129,13 +158,30 @@ const TaskList = () => {
   };
 
   const handleEdit = (item: TaskData) => {
-    navigate(`/task/edit/${item.id}`);
+    if (!permissionAccess(PERMISSIONS.EDIT_TASK as Permission)) {
+      showToast({
+        type: "error",
+        message: "You don't have permission to edit tasks",
+        duration: 5000,
+      });
+      return;
+    }
+    navigate(`/task/edit/${item.task_sno}`);
   };
 
   const handleDelete = async (item: TaskData): Promise<{ message: string }> => {
+    if (!permissionAccess(PERMISSIONS.DELETE_TASK as Permission)) {
+      showToast({
+        type: "error",
+        message: "You don't have permission to delete tasks",
+        duration: 5000,
+      });
+      throw new Error("Permission denied");
+    }
+
     try {
-      if (!item.id) throw new Error("Task ID is required");
-      await deleteTask(Number(item.id));
+      if (!item.task_sno) throw new Error("Task ID is required");
+      await deleteTask(Number(item.task_sno));
       showToast({
         type: "success",
         message: "Task deleted successfully",
@@ -153,10 +199,14 @@ const TaskList = () => {
     }
   };
 
+  if (!hasViewPermission) {
+    return null;
+  }
+
   return (
     <div className="task-list-container">
       <div className="task-list-header">
-        {permissionAccess("create_task" as Permission) && (
+        {permissionAccess(PERMISSIONS.CREATE_TASK as Permission) && (
           <Button
             type="submit"
             variant="primary"
@@ -174,11 +224,11 @@ const TaskList = () => {
         onEdit={handleEdit}
         onDelete={handleDelete}
         heading="Task"
-        textkey="task"
+        textkey="task_name"
         navKey={true}
-        createPermission="create_task"
-        deletePermission="delete_task"
-        updatePermission="update_task"
+        createPermission={PERMISSIONS.CREATE_TASK}
+        deletePermission={PERMISSIONS.DELETE_TASK}
+        updatePermission={PERMISSIONS.EDIT_TASK}
         dataKey="tasks"
       />
     </div>

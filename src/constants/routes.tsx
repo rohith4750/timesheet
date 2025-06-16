@@ -1,6 +1,6 @@
 import React from "react";
 import HomePage from "../pages/home-page/home-page";
-import { MenuItem, menuItems } from "./menu";
+import { MenuItem, getMenuItemsByRole } from "./menu";
 import TaskList from "../pages/task/tasklist";
 import AddTask from "../pages/task/add-task/add-task";
 import EditTask from "../pages/task/edit-task/edit-task";
@@ -36,9 +36,9 @@ const componentMap: Record<string, React.ReactNode> = {
 };
 
 export const routes: RouteConfig[] = [
-  ...menuItems
-    .filter((item) => item.isEnabled !== false)
-    .map(({ path }) => ({
+  ...getMenuItemsByRole()
+    .filter((item: MenuItem) => item.isEnabled !== false)
+    .map(({ path }: MenuItem) => ({
       path,
       element: componentMap[path],
     })),

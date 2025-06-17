@@ -1,0 +1,25 @@
+.project-assign-page {
+  padding: 2rem;
+
+  h1 {
+    margin: 0 0 1rem;
+    font-size: 1.75rem;
+    color: var(--text-primary);
+  }
+
+  .page-description {
+    margin: 0 0 2rem;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+  }
+} 

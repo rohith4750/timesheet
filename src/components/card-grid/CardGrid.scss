@@ -1,0 +1,38 @@
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  padding: 24px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .card-grid-item {
+    min-width: 0; // Prevents grid items from overflowing
+  }
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.empty-message {
+  text-align: center;
+  padding: 48px;
+  font-size: 16px;
+  color: var(--text-secondary);
+  background: var(--card-surface-primary);
+  border-radius: 8px;
+  margin: 24px;
+} 

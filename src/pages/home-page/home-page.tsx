@@ -27,16 +27,26 @@ const HomePage: React.FC = () => {
           return;
         }
 
+        console.log('Starting to fetch dashboard data...');
+        
         // Fetch both dashboard stats and recent tasks in parallel
         const [statsResponse, tasksResponse] = await Promise.all([
           getDashboardStats(),
           getRecentTasks()
         ]);
 
+        console.log('Dashboard stats response:', statsResponse);
+        console.log('Recent tasks response:', tasksResponse);
+
         setStats(statsResponse);
         setTasks(tasksResponse.tasks || []);
       } catch (error) {
         console.error("Error fetching data:", error);
+        // Log more detailed error information
+        if (error instanceof Error) {
+          console.error("Error message:", error.message);
+          console.error("Error stack:", error.stack);
+        }
         showToast({
           type: "error",
           message: "Failed to load dashboard data. Please try again.",
@@ -84,8 +94,8 @@ const HomePage: React.FC = () => {
                 <h3>{task.task_name}</h3>
                 <p>{task.task_description}</p>
                 <div className="task-meta">
-                  <span className={`status ${(task.status || '').toLowerCase()}`}>
-                    {task.status || 'Unknown'}
+                  <span className={`status ${(task.task_status || '').toLowerCase()}`}>
+                    {task.task_status || 'Unknown'}
                   </span>
                   <span className="hours">{task.no_of_hours || 0} hours</span>
                 </div>

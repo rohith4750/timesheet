@@ -1,22 +1,27 @@
 import { api, handleApiError } from './config';
+import { getAuthToken } from './authUtils';
 
 export interface UserData {
   user_sno: number;
   emp_id: string;
   user_firstname: string;
-  user_middlename: string;
+  user_middlename: string | null;
   user_lastname: string;
   user_fullname: string;
   user_phone: string;
   user_email: string;
-  actions?: boolean;
-  user_status?: string;
-  role: string;
+  user_status: string;
+  role_id: number;
+  role_name: string;
+  role_description: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface UserResponse {
-  userDetails: UserData;
-  message?: string;
+  success: boolean;
+  message: string;
+  data: UserData;
 }
 
 interface UserListResponse {
@@ -70,11 +75,25 @@ export const deleteUser = async (userSno: number): Promise<{ message: string }> 
 // Get logged-in user details
 export const getLoggedInUser = async (): Promise<UserResponse> => {
   try {
+    // Check if we have a valid auth token before making the request
+    const token = getAuthToken();
+    if (!token || !token.accessToken) {
+      throw new Error("No valid authentication token found");
+    }
+
     const response = await api.get<UserResponse>('/logged-in-user');
+    
+    if (!response.data || !response.data.data) {
+      throw new Error("Invalid response format from server");
+    }
+
     return response.data;
   } catch (error) {
     console.error('Error fetching logged-in user:', error);
-    throw error;
+    if (error instanceof Error) {
+      throw new Error(handleApiError(error));
+    }
+    throw new Error('Failed to fetch user details');
   }
 };
 
@@ -111,7 +130,7 @@ export const checkSuperAdmin = async (): Promise<boolean> => {
 export const fetchUser = async (): Promise<UserResponse> => {
   try {
     const response = await api.get<UserResponse>('/fetch/user');
-    if (!response.data || !response.data.userDetails) {
+    if (!response.data || !response.data.data) {
       throw new Error('Invalid response format from server');
     }
     return response.data;

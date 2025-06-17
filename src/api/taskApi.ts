@@ -4,7 +4,7 @@ export interface TaskData {
   task_sno: number;
   task_name: string;
   task_description: string;
-  status: string;
+  task_status: string;
   no_of_hours: number;
   user_sno: number;
   project_sno: number;

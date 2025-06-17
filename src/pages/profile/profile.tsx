@@ -38,13 +38,13 @@ const Profile: React.FC = () => {
     const loadUserData = async () => {
       try {
         const response = await fetchUser();
-        if (response.userDetails) {
-          setUserData(response.userDetails);
+        if (response && response.data) {
+          setUserData(response.data);
           setFormData({
-            firstName: response.userDetails.user_firstname || '',
-            lastName: response.userDetails.user_lastname || '',
-            email: response.userDetails.user_email || '',
-            phoneNumber: response.userDetails.user_phone || ''
+            firstName: response.data.user_firstname || "",
+            lastName: response.data.user_lastname || "",
+            email: response.data.user_email || "",
+            phoneNumber: response.data.user_phone || "",
           });
         }
       } catch (error: any) {
@@ -107,7 +107,7 @@ const Profile: React.FC = () => {
           user_email: formData.email,
           user_fullname: `${formData.firstName} ${formData.lastName}`,
           emp_id: userData.emp_id,
-          role: userData.role
+          role: userData.role_name
         })
       });
 
@@ -117,8 +117,8 @@ const Profile: React.FC = () => {
       }
 
       const responseData = await response.json();
-      if (responseData.userDetails) {
-        setUserData(responseData.userDetails);
+      if (responseData.data) {
+        setUserData(responseData.data);
         setIsEditing(false);
         showToast({
           type: "success",

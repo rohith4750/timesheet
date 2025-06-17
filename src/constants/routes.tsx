@@ -7,6 +7,7 @@ import EditTask from "../pages/task/edit-task/edit-task";
 import AddProject from "../pages/project/add-project/add-project";
 import EditProject from "../pages/project/edit-project/edit-project";
 import ProjectList from "../pages/project/projectlist/projectList";
+import ProjectAssign from "../pages/project-assign/project-assign";
 import Profile from "../pages/profile/profile";
 import AddUser from "../pages/users/add-user/add-user";
 import EditUser from "../pages/users/edit-user/edit-user";
@@ -23,6 +24,7 @@ const componentMap: Record<string, React.ReactNode> = {
   "/home-page": <HomePage />,
   "/task": <TaskList />,
   "/project": <ProjectList />,
+  "/project-assign": <ProjectAssign />,
   "/user": <UserList />,
   "/task/add": <AddTask />,
   "/task/edit": <EditTask />,

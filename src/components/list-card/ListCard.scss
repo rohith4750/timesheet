@@ -1,0 +1,130 @@
+.list-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: var(--text-primary);
+    }
+
+    .status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+
+      &.active {
+        background-color: #e6f4ea;
+        color: #1e7e34;
+      }
+
+      &.pending {
+        background-color: #fff3cd;
+        color: #856404;
+      }
+
+      &.inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+
+      &.completed {
+        background-color: #cce5ff;
+        color: #004085;
+      }
+    }
+  }
+
+  .card-description {
+    margin-bottom: 1rem;
+    
+    p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+  }
+
+  .card-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+      }
+
+      .value {
+        font-size: 0.875rem;
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+    }
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+
+    .action-button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &.primary {
+        background-color: var(--main-blue);
+        color: white;
+
+        &:hover {
+          background-color: #1a4b8c;
+        }
+      }
+
+      &.secondary {
+        background-color: #e9ecef;
+        color: var(--text-primary);
+
+        &:hover {
+          background-color: #dee2e6;
+        }
+      }
+
+      &.danger {
+        background-color: #dc3545;
+        color: white;
+
+        &:hover {
+          background-color: #c82333;
+        }
+      }
+    }
+  }
+} 

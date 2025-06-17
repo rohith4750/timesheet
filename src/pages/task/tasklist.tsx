@@ -56,21 +56,28 @@ const TaskList = () => {
     },
     {
       sortable: true,
-      key: "status",
+      key: "task_status",
       label: "Status",
-      field: "status",
+      field: "task_status",
       filterType: "select",
       filterOptions: [
-        { value: "PENDING", label: "Pending" },
-        { value: "IN_PROGRESS", label: "In Progress" },
-        { value: "COMPLETED", label: "Completed" },
+        { value: "draft", label: "Draft" },
+        { value: "in_progress", label: "In Progress" },
+        { value: "completed", label: "Completed" },
       ],
     },
     {
       sortable: true,
-      key: "start_date",
-      label: "Start Date",
-      field: "start_date",
+      key: "no_of_hours",
+      label: "Hours",
+      field: "no_of_hours",
+      filterType: "number",
+    },
+    {
+      sortable: true,
+      key: "created_at",
+      label: "Created Date",
+      field: "created_at",
       filterType: "date",
     },
   ];
@@ -106,11 +113,16 @@ const TaskList = () => {
           if (value && filteredData.length > 0 && key in filteredData[0]) {
             filteredData = filteredData.filter((item: TaskData) => {
               const itemValue = item[key as keyof TaskData];
-              if (typeof itemValue !== "string") return false;
-              if (key === "start_date") {
-                return itemValue.includes(value);
+              if (typeof itemValue === "number") {
+                return itemValue.toString().includes(value);
               }
-              return itemValue.toLowerCase().includes(value.toLowerCase());
+              if (typeof itemValue === "string") {
+                if (key === "created_at") {
+                  return itemValue.includes(value);
+                }
+                return itemValue.toLowerCase().includes(value.toLowerCase());
+              }
+              return false;
             });
           }
         });
@@ -137,25 +149,6 @@ const TaskList = () => {
       };
     }
   }, [hasViewPermission, showToast]);
-
-  const handleFilter = (params: FilterParams) => {
-    let newFilteredData = [...data];
-    if (params.filters) {
-      Object.entries(params.filters).forEach(([key, value]) => {
-        if (value && newFilteredData.length > 0 && key in newFilteredData[0]) {
-          newFilteredData = newFilteredData.filter((item: TaskData) => {
-            const itemValue = item[key as keyof TaskData];
-            if (typeof itemValue !== "string") return false;
-            if (key === "start_date") {
-              return itemValue.toLowerCase().includes(value.toLowerCase());
-            }
-            return itemValue.toLowerCase().includes(value.toLowerCase());
-          });
-        }
-      });
-    }
-    setFilteredData(newFilteredData);
-  };
 
   const handleEdit = (item: TaskData) => {
     if (!permissionAccess(PERMISSIONS.EDIT_TASK as Permission)) {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../services/auth";
 import InputField from "../../components/input-component/input-component";
@@ -22,6 +22,18 @@ const Login: React.FC = () => {
 
   const [errors, setErrors] = useState<Partial<LoginFormData>>({});
 
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log("User already authenticated, redirecting to home");
+      navigate("/home-page", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
   const validateForm = () => {
     const newErrors: Partial<LoginFormData> = {};
 
@@ -41,22 +53,28 @@ const Login: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const { showToast } = useToast();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submitted, validating...");
 
     if (validateForm()) {
+      console.log("Form validation passed, attempting login...");
       try {
+        console.log("Attempting login with:", formData);
         const response = await loginUser(formData);
+        console.log("Login API response:", response);
+        console.log("Full API response details:", JSON.stringify(response, null, 2));
+        
         if (response.success && response.token) {
-          // Store user role (you should get this from your API response)
-          localStorage.setItem('userRole', 'ADMIN'); // or whatever role the user has
+          console.log("API call successful, processing response...");
+          // Use the actual role from the API response
+          const userRole = response.role || 'USER'; // Default to USER if no role provided
+          console.log("User role from API:", userRole);
           
-          // Call the login function from auth context
-          await login(response.token, { role: 'ADMIN' }); // Pass the role here
+          console.log("About to call auth service login function...");
+          // Call the login function from auth context with the actual role
+          await login(response.token, { role: userRole });
+          console.log("Auth login completed successfully");
           
           showToast({
             type: "success",
@@ -64,11 +82,14 @@ const Login: React.FC = () => {
             duration: 2000
           });
           
-          // Add a small delay to ensure state updates are complete
+          console.log("Waiting for auth state to update...");
+          // Add a small delay to ensure auth state is updated
           setTimeout(() => {
+            console.log("Navigating to /home-page");
             navigate("/home-page", { replace: true });
           }, 100);
         } else {
+          console.log("API call failed:", response.message);
           throw new Error(response.message || "Login failed");
         }
       } catch (error) {
@@ -79,6 +100,8 @@ const Login: React.FC = () => {
           duration: 5000
         });
       }
+    } else {
+      console.log("Form validation failed");
     }
   };
 
@@ -118,6 +141,56 @@ const Login: React.FC = () => {
             <Button type="submit" variant="primary" size="large" fullWidth>
               Login
             </Button>
+            
+            {/* Test button for debugging */}
+            <div style={{ marginTop: '10px' }}>
+              <Button 
+                type="button" 
+                variant="secondary" 
+                size="large" 
+                fullWidth
+                onClick={() => {
+                  console.log("Testing auth login manually");
+                  login("test-token", { role: "ADMIN" });
+                }}
+              >
+                Test Auth Login
+              </Button>
+            </div>
+            
+            {/* Test localStorage directly */}
+            <div style={{ marginTop: '10px' }}>
+              <Button 
+                type="button" 
+                variant="secondary" 
+                size="large" 
+                fullWidth
+                onClick={() => {
+                  console.log("Testing localStorage directly");
+                  try {
+                    localStorage.setItem('test', 'test-value');
+                    const testValue = localStorage.getItem('test');
+                    console.log("localStorage test result:", testValue);
+                    localStorage.removeItem('test');
+                    
+                    // Test auth data storage
+                    localStorage.setItem('auth_token', JSON.stringify({ accessToken: 'test', expiresIn: Date.now() + 3600000 }));
+                    localStorage.setItem('isLogin', 'true');
+                    localStorage.setItem('userRole', 'ADMIN');
+                    
+                    console.log("localStorage after manual set:", {
+                      auth_token: localStorage.getItem('auth_token'),
+                      isLogin: localStorage.getItem('isLogin'),
+                      userRole: localStorage.getItem('userRole')
+                    });
+                  } catch (error) {
+                    console.error("localStorage test failed:", error);
+                  }
+                }}
+              >
+                Test localStorage
+              </Button>
+            </div>
           </form>
         </div>
       </div>

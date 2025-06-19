@@ -1,0 +1,114 @@
+.permission-denied {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 2rem;
+  background-color: #f8f9fa;
+
+  .permission-denied-content {
+    text-align: center;
+    max-width: 500px;
+    padding: 3rem 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+
+    .permission-denied-icon {
+      margin-bottom: 1.5rem;
+      
+      svg {
+        filter: drop-shadow(0 2px 4px rgba(244, 67, 54, 0.2));
+      }
+    }
+
+    .permission-denied-title {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: #dc3545;
+      margin-bottom: 1rem;
+      margin-top: 0;
+    }
+
+    .permission-denied-message {
+      font-size: 1rem;
+      color: #6c757d;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+      margin-top: 0;
+    }
+
+    .permission-denied-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+
+      .permission-denied-button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 120px;
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+
+        // Primary button
+        &:not(.secondary) {
+          background-color: #dc3545;
+          color: white;
+
+          &:hover {
+            background-color: #c82333;
+          }
+        }
+
+        // Secondary button
+        &.secondary {
+          background-color: #6c757d;
+          color: white;
+
+          &:hover {
+            background-color: #5a6268;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .permission-denied {
+    padding: 1rem;
+
+    .permission-denied-content {
+      padding: 2rem 1.5rem;
+
+      .permission-denied-title {
+        font-size: 1.5rem;
+      }
+
+      .permission-denied-actions {
+        flex-direction: column;
+        align-items: center;
+
+        .permission-denied-button {
+          width: 100%;
+          max-width: 200px;
+        }
+      }
+    }
+  }
+} 

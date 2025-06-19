@@ -4,6 +4,7 @@ import TableComponent from "../../components/table/table";
 import { permissionAccess } from "../../hooks/permissionAccess";
 import Button from "../../components/button/button";
 import { useToast } from "../../components/toast/ToastContext";
+//import PermissionDenied from "../../components/shared/permission-denied/PermissionDenied";
 import {
   getUsers,
   deleteUser,
@@ -40,6 +41,9 @@ const UserList = () => {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  // Check if user has permission to view users
+  const hasViewUserPermission = permissionAccess(PERMISSIONS.VIEW_USER);
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -131,15 +135,37 @@ const UserList = () => {
         };
       } catch (error) {
         console.error("Error fetching users:", error);
+
+        // Handle specific error cases
         if ((error as AxiosError)?.response?.status === 401) {
           navigate("/login");
+          return { data: [], total: 0, users: [] };
         }
+
+        if ((error as AxiosError)?.response?.status === 403) {
+          // Show permission denied message
+          showToast({
+            type: "error",
+            message:
+              "You don't have permission to view users. Please contact your administrator.",
+            duration: 5000,
+          });
+          return { data: [], total: 0, users: [] };
+        }
+
+        // Handle other errors
+        showToast({
+          type: "error",
+          message: "Failed to load users. Please try again later.",
+          duration: 3000,
+        });
+
         return { data: [], total: 0, users: [] }; // Return empty data on error
       } finally {
         setLoading(false);
       }
     },
-    [navigate, refreshTrigger]
+    [navigate, refreshTrigger, showToast]
   );
 
   const handleEdit = (item: UserData) => {
@@ -174,6 +200,18 @@ const UserList = () => {
   useEffect(() => {
     setRefreshTrigger((prev) => prev + 1);
   }, []);
+
+  // Show permission denied message if user doesn't have access
+  // if (!hasViewUserPermission) {
+  //   return (
+  //     <div className="user-list-container">
+  //       <PermissionDenied
+  //         title="Access Denied"
+  //         message="You don't have permission to view the users list."
+  //       />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="user-list-container">

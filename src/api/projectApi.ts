@@ -20,8 +20,9 @@ export interface ProjectFormData {
 }
 
 export interface ProjectResponse {
-  projects: ProjectData[];
-  total: number;
+  success: boolean;
+  statusCode: number;
+  project: ProjectData[];
   message?: string;
 }
 

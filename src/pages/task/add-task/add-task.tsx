@@ -37,7 +37,7 @@ const AddTask: React.FC = () => {
         setUsers(usersResponse.users || []);
 
         // Map ProjectData to Project interface
-        const mappedProjects: Project[] = (projectsResponse.projects || []).map((project: ProjectData) => ({
+        const mappedProjects: Project[] = (projectsResponse.project || []).map((project: ProjectData) => ({
           project_sno: project.project_sno,
           project_name: project.project_name
         }));

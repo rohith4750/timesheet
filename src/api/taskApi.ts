@@ -13,10 +13,11 @@ export interface TaskData {
 }
 
 export interface TaskResponse {
-  tasks: TaskData[];
-  total: number;
-  page: number;
-  limit: number;
+  tasks?: TaskData[];
+  userTasks?: TaskData[];
+  total?: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface TaskCreateResponse {

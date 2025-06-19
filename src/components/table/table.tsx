@@ -191,12 +191,17 @@ TableComponentProps) {
       // sort_order: sortOrder,
       filters: { ...removeEmptyFields(filters) },
     };
+    console.log('fetchTableData called with params:', params);
     setIsLoading(true);
     fetchData(params)
       .then((res) => {
+        console.log('fetchData response:', res);
+        console.log('res.data:', res.data);
+        console.log('res.total:', res.total);
         setData(res.data || []);
         setTotalRecords(res.total);
-        console.log(data, "data");
+        console.log('data state after setData:', res.data || []);
+        console.log('totalRecords state after setTotalRecords:', res.total);
         setIsLoading(false);
       })
       .catch((err) => {
@@ -215,6 +220,18 @@ TableComponentProps) {
   useEffect(() => {
     fetchTableData();
   }, [fetchTableData]);
+
+  // Debug effect to log data state
+  useEffect(() => {
+    console.log('Data state changed:', data, 'Data length:', data?.length);
+  }, [data]);
+
+  // Debug effect to log when rendering no records
+  useEffect(() => {
+    if (!data || data.length === 0) {
+      console.log('Rendering no records found. Data:', data, 'Data length:', data?.length);
+    }
+  }, [data]);
 
   const handleDelete = useCallback(
     (selectedItem: any) => {
@@ -711,161 +728,164 @@ TableComponentProps) {
                   </td>
                 </tr>
               ) : (
-                data.map((item, index) => (
-                  <tr key={index}>
-                    {columns
-                      .filter((col) => selectedColumns.includes(col.key))
-                      .map((col) => {
-                        if (
-                          col.key === "action" &&
-                          actions &&
-                          !item.disableActions
-                        ) {
-                          if (col?.list?.length) {
-                            return (
-                              <td
-                                key={col.key}
-                                className={
-                                  col.field === "action" ? "td-action" : ""
-                                }
-                              >
-                                <div className="table-buttons-container">
-                                  {col.list.map((btnlist: any, bi: number) => (
-                                    <>
-                                      {btnlist.btnType === "text" && (
-                                        <button
-                                          disabled={item.disableActions}
-                                          key={bi}
-                                          className={`${btnlist?.classes} text-icon`}
-                                          onClick={(e) =>
-                                            handleCustomEvent({
-                                              event: e,
-                                              item,
-                                              col: btnlist,
-                                            })
-                                          }
-                                        >
-                                          {btnlist.icon && (
-                                            <img src={btnlist.icon} />
-                                          )}
-                                          {btnlist.btnType === "text" && (
-                                            <>{btnlist.label}</>
-                                          )}
-                                        </button>
-                                      )}
-                                      {btnlist.btnType === "icon" && (
-                                        <>
-                                          {btnlist.label === "edit" && (
-                                            <button
-                                              className="edit-btn"
-                                              disabled={item.disableActions}
-                                              onClick={() => {
-                                                setIsDialogOpen(true);
-                                                setSelectedItem(item);
-                                                setActionType("0");
-                                              }}
-                                            >
-                                              <img
-                                                className="edit-icon"
-                                                src={edit}
-                                                alt="Edit"
-                                              />
-                                            </button>
-                                          )}
-                                          {btnlist.label === "delete" && (
-                                            <button
-                                              className="delete-btn"
-                                              disabled={item.disableActions}
-                                              onClick={() => {
-                                                setIsDialogOpen(true);
-                                                setSelectedItem(item);
-                                                setActionType("1");
-                                              }}
-                                            >
-                                              <img
-                                                className="edit-icon"
-                                                src={deleteIcon}
-                                                alt="Delete"
-                                              />
-                                            </button>
-                                          )}
-                                          {btnlist.label !== "edit" &&
-                                            btnlist.label !== "delete" && (
+                data.map((item, index) => {
+                  console.log('Rendering data item:', item, 'at index:', index);
+                  return (
+                    <tr key={index}>
+                      {columns
+                        .filter((col) => selectedColumns.includes(col.key))
+                        .map((col) => {
+                          if (
+                            col.key === "action" &&
+                            actions &&
+                            !item.disableActions
+                          ) {
+                            if (col?.list?.length) {
+                              return (
+                                <td
+                                  key={col.key}
+                                  className={
+                                    col.field === "action" ? "td-action" : ""
+                                  }
+                                >
+                                  <div className="table-buttons-container">
+                                    {col.list.map((btnlist: any, bi: number) => (
+                                      <>
+                                        {btnlist.btnType === "text" && (
+                                          <button
+                                            disabled={item.disableActions}
+                                            key={bi}
+                                            className={`${btnlist?.classes} text-icon`}
+                                            onClick={(e) =>
+                                              handleCustomEvent({
+                                                event: e,
+                                                item,
+                                                col: btnlist,
+                                              })
+                                            }
+                                          >
+                                            {btnlist.icon && (
+                                              <img src={btnlist.icon} />
+                                            )}
+                                            {btnlist.btnType === "text" && (
+                                              <>{btnlist.label}</>
+                                            )}
+                                          </button>
+                                        )}
+                                        {btnlist.btnType === "icon" && (
+                                          <>
+                                            {btnlist.label === "edit" && (
                                               <button
+                                                className="edit-btn"
                                                 disabled={item.disableActions}
-                                                key={bi}
-                                                className={btnlist.classes}
-                                                onClick={(e) =>
-                                                  handleCustomEvent({
-                                                    event: e,
-                                                    item,
-                                                    col: btnlist,
-                                                  })
-                                                }
+                                                onClick={() => {
+                                                  setIsDialogOpen(true);
+                                                  setSelectedItem(item);
+                                                  setActionType("0");
+                                                }}
                                               >
                                                 <img
-                                                  className="action-btn"
-                                                  src={getIcon(btnlist.icon)}
-                                                  alt={btnlist.label}
+                                                  className="edit-icon"
+                                                  src={edit}
+                                                  alt="Edit"
                                                 />
                                               </button>
                                             )}
-                                        </>
-                                      )}
-                                    </>
-                                  ))}
+                                            {btnlist.label === "delete" && (
+                                              <button
+                                                className="delete-btn"
+                                                disabled={item.disableActions}
+                                                onClick={() => {
+                                                  setIsDialogOpen(true);
+                                                  setSelectedItem(item);
+                                                  setActionType("1");
+                                                }}
+                                              >
+                                                <img
+                                                  className="edit-icon"
+                                                  src={deleteIcon}
+                                                  alt="Delete"
+                                                />
+                                              </button>
+                                            )}
+                                            {btnlist.label !== "edit" &&
+                                              btnlist.label !== "delete" && (
+                                                <button
+                                                  disabled={item.disableActions}
+                                                  key={bi}
+                                                  className={btnlist.classes}
+                                                  onClick={(e) =>
+                                                    handleCustomEvent({
+                                                      event: e,
+                                                      item,
+                                                      col: btnlist,
+                                                    })
+                                                  }
+                                                >
+                                                  <img
+                                                    className="action-btn"
+                                                    src={getIcon(btnlist.icon)}
+                                                    alt={btnlist.label}
+                                                  />
+                                                </button>
+                                              )}
+                                          </>
+                                        )}
+                                      </>
+                                    ))}
+                                  </div>
+                                </td>
+                              );
+                            }
+                          }
+
+                          if (
+                            col.field?.includes("status") &&
+                            col?.type === "toggle"
+                          ) {
+                            return (
+                              <td key={col.key}>
+                                <div className="reset-status">
+                                  <span
+                                    className={`status with-dot ${String(
+                                      item[col.key]
+                                    ).toLowerCase()}`}
+                                  >
+                                    {item[col.key]}
+                                  </span>
+                                  <img
+                                    src={reset}
+                                    className="reset-icon"
+                                    alt="reset"
+                                    onClick={() =>
+                                      handleConfirmation(item, "reset")
+                                    }
+                                    style={{ cursor: "pointer" }}
+                                  />
                                 </div>
                               </td>
                             );
                           }
-                        }
 
-                        if (
-                          col.field?.includes("status") &&
-                          col?.type === "toggle"
-                        ) {
-                          return (
-                            <td key={col.key}>
-                              <div className="reset-status">
-                                <span
-                                  className={`status with-dot ${String(
-                                    item[col.key]
-                                  ).toLowerCase()}`}
-                                >
-                                  {item[col.key]}
-                                </span>
-                                <img
-                                  src={reset}
-                                  className="reset-icon"
-                                  alt="reset"
-                                  onClick={() =>
-                                    handleConfirmation(item, "reset")
-                                  }
-                                  style={{ cursor: "pointer" }}
-                                />
-                              </div>
-                            </td>
-                          );
-                        }
-
-                        if (col?.clickable) {
-                          return (
-                            <td
-                              key={col.key}
-                              onClick={() =>
-                                eventKey ? eventKey({ col, item }) : null
-                              }
-                              style={{ fontWeight: "bold", cursor: "pointer" }}
-                            >
-                              {item[col.key]}
-                            </td>
-                          );
-                        } else {
-                          return <td key={col.key}>{item[col.key]}</td>;
-                        }
-                      })}
-                  </tr>
-                ))
+                          if (col?.clickable) {
+                            return (
+                              <td
+                                key={col.key}
+                                onClick={() =>
+                                  eventKey ? eventKey({ col, item }) : null
+                                }
+                                style={{ fontWeight: "bold", cursor: "pointer" }}
+                              >
+                                {item[col.key]}
+                              </td>
+                            );
+                          } else {
+                            return <td key={col.key}>{item[col.key]}</td>;
+                          }
+                        })}
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

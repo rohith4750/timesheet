@@ -10,16 +10,14 @@ interface AuthProps {
 
 const withRoleAuthorization = (WrappedComponent: React.FC, item: AuthProps) => {
   return (props: any) => {
-    const hasRole = userRoleAccess(item.userRole || []);
+    const hasRole = item.userRole ? userRoleAccess(item.userRole) : false;
     if (!hasRole) {
       if (permissionAccess(item.permissions || 'ALL')) {
         return <WrappedComponent {...props} />
-      } else {
-        return <Navigate to='/unauthorized' replace={true} />
       }
-    } else {
-      return <WrappedComponent {...props} />
+      return null;
     }
+    return <WrappedComponent {...props} />
   }
 }
 
@@ -36,3 +34,5 @@ export const withAuthentication = (WrappedComponent: React.FC, item: AuthProps) 
     }
   }
 }
+
+export default withRoleAuthorization;

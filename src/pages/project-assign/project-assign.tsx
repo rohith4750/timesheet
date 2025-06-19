@@ -15,8 +15,8 @@ const ProjectAssign: React.FC = () => {
       try {
         setLoading(true);
         const response = await getProjects();
-        if (response && response.projects) {
-          setProjects(response.projects);
+        if (response && response.success && response.project) {
+          setProjects(response.project);
         }
       } catch (error) {
         console.error('Error fetching projects:', error);

@@ -76,7 +76,11 @@ const ProjectList = () => {
   ];
 
   const fetchData = useCallback(async (params: FilterParams) => {
+    console.log('fetchData called with params:', params);
+    console.log('hasViewPermission:', hasViewPermission);
+    
     if (!hasViewPermission) {
+      console.log('No view permission, returning empty data');
       return {
         data: [],
         total: 0,
@@ -86,19 +90,28 @@ const ProjectList = () => {
     try {
       const page = 1; // TODO: Implement pagination
       const limit = 10;
+      console.log('Calling getProjects with page:', page, 'limit:', limit);
       const response = await getProjects(page, limit);
       console.log('API Response:', response); // Debug log
+      console.log('Response type:', typeof response);
+      console.log('Response keys:', Object.keys(response || {}));
 
-      if (!response || !response.projects) {
-        console.error('Invalid response format:', response);
+      // Handle the actual API response format
+      if (!response || !response.success) {
+        console.error('Invalid response format or unsuccessful response:', response);
         return {
           data: [],
           total: 0,
         };
       }
 
-      let filteredData = response.projects;
-      console.log('Initial filtered data:', filteredData); // Debug log
+      // The API returns {success: true, statusCode: 200, project: Array(10)}
+      const projectData = response.project || [];
+      console.log('Project data from API:', projectData); // Debug log
+      console.log('Project data length:', projectData.length);
+      console.log('First item in project data:', projectData[0]);
+
+      let filteredData = projectData;
 
       // Apply filters if they exist
       if (params.filters) {
@@ -117,13 +130,16 @@ const ProjectList = () => {
       }
 
       console.log('Final filtered data:', filteredData); // Debug log
+      console.log('Setting data state with:', filteredData);
       setData(filteredData);
       setFilteredData(filteredData);
 
-      return {
+      const result = {
         data: filteredData,
-        total: response.total || filteredData.length,
+        total: projectData.length, // Use the length since total is not provided in API response
       };
+      console.log('Returning result:', result);
+      return result;
     } catch (error) {
       console.error("Error fetching projects:", error);
       showToast({

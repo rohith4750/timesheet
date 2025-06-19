@@ -96,7 +96,7 @@ const TaskList = () => {
       const response = await getUserTasks(page, limit);
       console.log('API Response:', response); // Debug log
 
-      if (!response || !response.tasks) {
+      if (!response || !response.userTasks) {
         console.error('Invalid response format:', response);
         return {
           data: [],
@@ -104,7 +104,7 @@ const TaskList = () => {
         };
       }
 
-      let filteredData = response.tasks;
+      let filteredData = response.userTasks;
       console.log('Initial filtered data:', filteredData); // Debug log
 
       // Apply filters if they exist

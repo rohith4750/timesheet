@@ -11,6 +11,7 @@ import {
 } from "../../../api/projectApi";
 import { Permission, PERMISSIONS } from "../../../constants/permissions";
 import { useToast } from "../../../components/toast/ToastContext";
+import { projectTableColumns } from "../project-Config";
 
 interface FilterParams {
   filters?: Record<keyof ProjectData, string>;
@@ -38,42 +39,6 @@ const ProjectList = () => {
     };
     checkPermission();
   }, [navigate, showToast]);
-
-  const columns = [
-    {
-      sortable: true,
-      key: "project_name",
-      label: "Project Name",
-      field: "project_name",
-      filterType: "text",
-    },
-    {
-      sortable: true,
-      key: "project_description",
-      label: "Description",
-      field: "project_description",
-      filterType: "text",
-    },
-    {
-      sortable: true,
-      key: "project_status",
-      label: "Status",
-      field: "project_status",
-      filterType: "select",
-      filterOptions: [
-        { value: "ACTIVE", label: "Active" },
-        { value: "INACTIVE", label: "Inactive" },
-        { value: "COMPLETED", label: "Completed" },
-      ],
-    },
-    {
-      sortable: true,
-      key: "created_at",
-      label: "Created Date",
-      field: "created_at",
-      filterType: "date",
-    },
-  ];
 
   const fetchData = useCallback(async (params: FilterParams) => {
     console.log('fetchData called with params:', params);
@@ -120,7 +85,7 @@ const ProjectList = () => {
             filteredData = filteredData.filter((item: ProjectData) => {
               const itemValue = item[key as keyof ProjectData];
               if (typeof itemValue !== "string") return false;
-              if (key === "created_at") {
+              if (key === "created_at" || key === "updated_at") {
                 return itemValue.includes(value);
               }
               return itemValue.toLowerCase().includes(value.toLowerCase());
@@ -179,30 +144,21 @@ const ProjectList = () => {
     try {
       if (!item.project_sno) throw new Error("Project ID is required");
       await deleteProject(Number(item.project_sno));
+      showToast({
+        type: "success",
+        message: "Project deleted successfully",
+        duration: 2000,
+      });
       return { message: "Project deleted successfully" };
     } catch (error) {
       console.error("Error deleting project:", error);
+      showToast({
+        type: "error",
+        message: "Failed to delete project. Please try again.",
+        duration: 5000,
+      });
       throw new Error("Failed to delete project");
     }
-  };
-
-  const handleFilter = (params: FilterParams) => {
-    let newFilteredData = [...data];
-    if (params.filters) {
-      Object.entries(params.filters).forEach(([key, value]) => {
-        if (value && newFilteredData.length > 0 && key in newFilteredData[0]) {
-          newFilteredData = newFilteredData.filter((item: ProjectData) => {
-            const itemValue = item[key as keyof ProjectData];
-            if (typeof itemValue !== "string") return false;
-            if (key === "created_at") {
-              return itemValue.toLowerCase().includes(value.toLowerCase());
-            }
-            return itemValue.toLowerCase().includes(value.toLowerCase());
-          });
-        }
-      });
-    }
-    setFilteredData(newFilteredData);
   };
 
   if (!hasViewPermission) {
@@ -212,30 +168,30 @@ const ProjectList = () => {
   return (
     <div className="project-list-container">
       <div className="project-list-header">
+        <h1>Project Management</h1>
         {permissionAccess(PERMISSIONS.CREATE_PROJECT as Permission) && (
           <Button
-            type="submit"
-            variant="primary"
-            size="small"
             onClick={() => navigate("/project/add")}
-            fullWidth
+            showPlusIcon
+            variant="primary"
           >
-            Add Project
+            Add New Project
           </Button>
         )}
       </div>
+
       <TableComponent
-        columns={columns}
-        fetchData={fetchData}
+        columns={projectTableColumns}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        heading="Project"
+        fetchData={fetchData}
+        dataKey="project"
         textkey="project_name"
+        heading="Project"
         navKey={true}
         createPermission={PERMISSIONS.CREATE_PROJECT}
         deletePermission={PERMISSIONS.DELETE_PROJECT}
         updatePermission={PERMISSIONS.EDIT_PROJECT}
-        dataKey="projects"
       />
     </div>
   );

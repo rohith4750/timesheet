@@ -1,90 +1,137 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ReusableForm from "../../../components/reusable-form/reusableform";
 import { useToast } from "../../../components/toast/ToastContext";
-import { FormField } from "../../../types/form";
-interface TaskData {
-  task: string;
-  task_description: string;
-  ut_status: string;
-  task_start_at: string;
+import { permissionAccess } from "../../../hooks/permissionAccess";
+import { PERMISSIONS } from "../../../constants/permissions";
+import { getProjectDetails, updateProject, ProjectData } from "../../../api/projectApi";
+import { getUsers, UserData } from "../../../api/userApi";
+import { projectFormFields, projectFormConfig, projectValidationRules } from "../project-Config";
+import "./edit-project.scss";
+
+interface ProjectFormData {
+  project_name: string;
+  project_description: string;
+  project_manager: number;
+  project_status: string;
 }
 
 const EditProject: React.FC = () => {
   const navigate = useNavigate();
+  const { projectId } = useParams<{ projectId: string }>();
   const { showToast } = useToast();
-  const [initialData, setInitialData] = useState<TaskData | null>(null);
-
-  const formFields: FormField[] = [
-    {
-      label: "Project Name",
-      type: "text",
-      name: "task",
-      required: true,
-      maxLength: 30,
-      placeholder: "Enter task name",
-    },
-    {
-      label: "Project Description",
-      type: "textarea",
-      name: "task_description",
-      required: true,
-      maxLength: 200,
-      placeholder: "Enter task description",
-    },
-    {
-      label: "Task Status",
-      type: "select",
-      name: "ut_status",
-      required: true,
-      options: [
-        { value: "draft", label: "Draft" },
-        { value: "pending", label: "Pending" },
-        { value: "approved", label: "Approved" },
-        { value: "rejected", label: "Rejected" },
-      ],
-    },
-    {
-      label: "Start Date",
-      type: "date",
-      name: "task_start_at",
-      required: true,
-    },
-  ];
+  const [initialData, setInitialData] = useState<ProjectData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [formFields, setFormFields] = useState(projectFormFields);
 
   useEffect(() => {
-    const fetchTaskData = async () => {
+    const fetchData = async () => {
       try {
-        // TODO: Implement API call to fetch task data
-        // For now, using mock data
-        const mockData = {
-          task: "Sample Task",
-          task_description: "Sample Description",
-          ut_status: "draft",
-          task_start_at: "2024-01-01",
-        };
-        setInitialData(mockData);
+        if (!projectId) {
+          showToast({
+            type: "error",
+            message: "Project ID is required",
+            duration: 5000
+          });
+          navigate("/project");
+          return;
+        }
+
+        const [projectResponse, usersResponse] = await Promise.all([
+          getProjectDetails(Number(projectId)),
+          getUsers(1, 100)
+        ]);
+
+        setInitialData(projectResponse);
+
+        // Update form fields with dynamic options
+        const updatedFormFields = projectFormFields.map(field => {
+          if (field.name === 'project_manager') {
+            return {
+              ...field,
+              options: usersResponse.users?.map((user: UserData) => ({
+                value: user.user_sno,
+                label: user.user_fullname
+              })) || []
+            };
+          }
+          return field;
+        });
+
+        setFormFields(updatedFormFields);
       } catch (error) {
-        console.error("Error fetching task data:", error);
+        console.error("Error fetching data:", error);
+        showToast({
+          type: "error",
+          message: "Failed to load project data. Please try again.",
+          duration: 5000
+        });
+        navigate("/project");
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchTaskData();
-  }, []);
+    fetchData();
+  }, [projectId, navigate, showToast]);
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: ProjectFormData) => {
     try {
-      // TODO: Implement API call to update project
-      console.log("Form submitted:", formData);
+      // Check if user has permission to edit projects
+      if (!permissionAccess(PERMISSIONS.EDIT_PROJECT)) {
+        showToast({
+          type: "error",
+          message: "You don't have permission to edit projects.",
+          duration: 5000
+        });
+        return;
+      }
 
+      if (!projectId) {
+        showToast({
+          type: "error",
+          message: "Project ID is required",
+          duration: 5000
+        });
+        return;
+      }
+
+      // Validate form data
+      const validationErrors: string[] = [];
+      
+      if (!formData.project_name || formData.project_name.length > 30) {
+        validationErrors.push(projectValidationRules.project_name.maxLength || "Project name validation failed");
+      }
+      
+      if (!formData.project_manager) {
+        validationErrors.push(projectValidationRules.project_manager.required || "Project manager selection required");
+      }
+
+      if (validationErrors.length > 0) {
+        showToast({
+          type: "error",
+          message: validationErrors.join(", "),
+          duration: 5000
+        });
+        return;
+      }
+
+      // Convert string values to numbers for numeric fields
+      const processedData = {
+        ...formData,
+        project_manager: Number(formData.project_manager),
+      };
+
+      const response = await updateProject(Number(projectId), processedData);
+      
       showToast({
         type: "success",
-        message: "Project updated successfully!",
+        message: response.message || "Project updated successfully",
         duration: 2000
       });
 
       setTimeout(() => {
-        navigate("/task");
+        navigate("/project");
       }, 2000);
     } catch (error) {
       console.error("Error updating project:", error);
@@ -96,19 +143,21 @@ const EditProject: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
   if (!initialData) {
-    return <div>Loading...</div>;
+    return <div className="error">Project not found</div>;
   }
 
   return (
-    <div className="edit-task-container">
+    <div className="edit-project-container">
       <ReusableForm
         fields={formFields}
         onSubmit={handleSubmit}
-        config={{
-          submitButtonText: "Update Task",
-          formTitle: "Edit Task",
-        }}
+        onCancel={() => navigate('/project')}
+        config={projectFormConfig}
         initialData={initialData}
       />
     </div>

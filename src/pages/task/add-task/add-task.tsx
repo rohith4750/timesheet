@@ -7,6 +7,7 @@ import { PERMISSIONS } from "../../../constants/permissions";
 import { createTask, TaskData, TaskCreateResponse } from "../../../api/taskApi";
 import { getUsers, UserData } from "../../../api/userApi";
 import { getProjects, ProjectData } from "../../../api/projectApi";
+import { taskFormFields, taskFormConfig, taskValidationRules } from "../task-config";
 import "./add-task.scss";
 
 interface Project {
@@ -25,6 +26,7 @@ const AddTask: React.FC = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [formFields, setFormFields] = useState(taskFormFields);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +45,31 @@ const AddTask: React.FC = () => {
         }));
 
         setProjects(mappedProjects);
+
+        // Update form fields with dynamic options
+        const updatedFormFields = taskFormFields.map(field => {
+          if (field.name === 'user_sno') {
+            return {
+              ...field,
+              options: usersResponse.users?.map(user => ({
+                value: user.user_sno,
+                label: user.user_fullname
+              })) || []
+            };
+          }
+          if (field.name === 'project_sno') {
+            return {
+              ...field,
+              options: mappedProjects.map(project => ({
+                value: project.project_sno.toString(),
+                label: project.project_name
+              }))
+            };
+          }
+          return field;
+        });
+
+        setFormFields(updatedFormFields);
       } catch (error) {
         console.error("Error fetching data:", error);
         showToast({
@@ -58,72 +85,6 @@ const AddTask: React.FC = () => {
     fetchData();
   }, []);
 
-  const formFields = [
-    {
-      label: "User",
-      type: "select",
-      name: "user_sno",
-      required: true,
-      placeholder: "Select user",
-      options: users.map(user => ({
-        value: user.user_sno,
-        label: user.user_fullname
-      })),
-    },
-    {
-      label: "Project",
-      type: "select",
-      name: "project_sno",
-      required: true,
-      placeholder: "Select project",
-      options: projects.map(project => ({
-        value: project.project_sno.toString(),
-        label: project.project_name
-      })),
-    },
-    {
-      label: "Task Name",
-      type: "text",
-      name: "task_name",
-      required: true,
-      placeholder: "Enter task name",
-    },
-    {
-      label: "Description",
-      type: "textarea",
-      name: "task_description",
-      required: true,
-      placeholder: "Enter task description",
-    },
-    {
-      label: "Status",
-      type: "select",
-      name: "status",
-      required: true,
-      options: [
-        { value: "PENDING", label: "Pending" },
-        { value: "IN_PROGRESS", label: "In Progress" },
-        { value: "COMPLETED", label: "Completed" },
-      ],
-      defaultValue: "PENDING",
-    },
-    {
-      label: "Number of Hours",
-      type: "number",
-      name: "no_of_hours",
-      required: true,
-      placeholder: "Enter number of hours",
-      min: 0,
-      step: 0.5,
-    },
-  ];
-
-  const formConfig = {
-    formTitle: "Add New Task",
-    submitButtonText: "Save",
-    cancelButtonText: "Cancel",
-  };
-
   const handleSubmit = async (formData: TaskFormData) => {
     try {
       // Check if user has permission to create tasks
@@ -131,6 +92,38 @@ const AddTask: React.FC = () => {
         showToast({
           type: "error",
           message: "You don't have permission to create tasks.",
+          duration: 5000
+        });
+        return;
+      }
+
+      // Validate form data
+      const validationErrors: string[] = [];
+      
+      if (!formData.task_name || formData.task_name.length > 30) {
+        validationErrors.push(taskValidationRules.task_name.maxLength || "Task name validation failed");
+      }
+      
+      if (formData.task_description && formData.task_description.length > 200) {
+        validationErrors.push(taskValidationRules.task_description.maxLength || "Task description validation failed");
+      }
+      
+      if (!formData.no_of_hours || formData.no_of_hours < 0) {
+        validationErrors.push(taskValidationRules.no_of_hours.min || "Hours validation failed");
+      }
+      
+      if (!formData.user_sno) {
+        validationErrors.push(taskValidationRules.user_sno.required || "User selection required");
+      }
+      
+      if (!formData.project_sno) {
+        validationErrors.push(taskValidationRules.project_sno.required || "Project selection required");
+      }
+
+      if (validationErrors.length > 0) {
+        showToast({
+          type: "error",
+          message: validationErrors.join(", "),
           duration: 5000
         });
         return;
@@ -175,7 +168,7 @@ const AddTask: React.FC = () => {
         fields={formFields}
         onSubmit={handleSubmit}
         onCancel={() => navigate('/task')}
-        config={formConfig}
+        config={taskFormConfig}
       />
     </div>
   );

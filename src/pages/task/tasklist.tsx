@@ -11,6 +11,7 @@ import {
   TaskData,
 } from "../../api/taskApi";
 import { Permission, PERMISSIONS } from "../../constants/permissions";
+import { taskTableColumns } from "./task-config";
 
 interface FilterParams {
   filters?: Record<keyof TaskData, string>;
@@ -38,49 +39,6 @@ const TaskList = () => {
     };
     checkPermission();
   }, [navigate, showToast]);
-
-  const columns = [
-    {
-      sortable: true,
-      key: "task_name",
-      label: "Task Name",
-      field: "task_name",
-      filterType: "text",
-    },
-    {
-      sortable: true,
-      key: "task_description",
-      label: "Description",
-      field: "task_description",
-      filterType: "text",
-    },
-    {
-      sortable: true,
-      key: "task_status",
-      label: "Status",
-      field: "task_status",
-      filterType: "select",
-      filterOptions: [
-        { value: "draft", label: "Draft" },
-        { value: "in_progress", label: "In Progress" },
-        { value: "completed", label: "Completed" },
-      ],
-    },
-    {
-      sortable: true,
-      key: "no_of_hours",
-      label: "Hours",
-      field: "no_of_hours",
-      filterType: "number",
-    },
-    {
-      sortable: true,
-      key: "created_at",
-      label: "Created Date",
-      field: "created_at",
-      filterType: "date",
-    },
-  ];
 
   const fetchData = useCallback(async (params: FilterParams) => {
     if (!hasViewPermission) {
@@ -117,7 +75,7 @@ const TaskList = () => {
                 return itemValue.toString().includes(value);
               }
               if (typeof itemValue === "string") {
-                if (key === "created_at") {
+                if (key === "created_at" || key === "updated_at") {
                   return itemValue.includes(value);
                 }
                 return itemValue.toLowerCase().includes(value.toLowerCase());
@@ -199,30 +157,30 @@ const TaskList = () => {
   return (
     <div className="task-list-container">
       <div className="task-list-header">
+        <h1>Task Management</h1>
         {permissionAccess(PERMISSIONS.CREATE_TASK as Permission) && (
           <Button
-            type="submit"
-            variant="primary"
-            size="small"
             onClick={() => navigate("/task/add")}
-            fullWidth
+            showPlusIcon
+            variant="primary"
           >
-            Add Task
+            Add New Task
           </Button>
         )}
       </div>
+
       <TableComponent
-        columns={columns}
-        fetchData={fetchData}
+        columns={taskTableColumns}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        heading="Task"
+        fetchData={fetchData}
+        dataKey="userTasks"
         textkey="task_name"
+        heading="Task"
         navKey={true}
         createPermission={PERMISSIONS.CREATE_TASK}
         deletePermission={PERMISSIONS.DELETE_TASK}
         updatePermission={PERMISSIONS.EDIT_TASK}
-        dataKey="tasks"
       />
     </div>
   );

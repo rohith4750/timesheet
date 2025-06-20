@@ -5,7 +5,7 @@ export function permissionAccess(permission: Permission | 'ALL'): boolean {
     return true;
   }
 
-  const userRole = localStorage.getItem('userRole') as Role;
+  const userRole = (localStorage.getItem('userRole') || '').toUpperCase() as Role;
   if (!userRole) {
     return false;
   }
@@ -14,7 +14,7 @@ export function permissionAccess(permission: Permission | 'ALL'): boolean {
 }
 
 export function userRoleAccess(allowedRoles: Role[]): boolean {
-  const userRole = localStorage.getItem('userRole') as Role;
+  const userRole = (localStorage.getItem('userRole') || '').toUpperCase() as Role;
   if (!userRole) {
     return false;
   }

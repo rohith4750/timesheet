@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROLES, getPermissionsForRole } from '../constants/permissions';
+import { fetchUser } from '../api/userApi';
 
 interface AuthContextType {
   isAuthenticated: boolean;

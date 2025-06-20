@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReusableForm from "../../../components/reusable-form/reusableform";
 import { useToast } from "../../../components/toast/ToastContext";
+import { permissionAccess } from "../../../hooks/permissionAccess";
+import { PERMISSIONS } from "../../../constants/permissions";
 import { createProject, ProjectData } from "../../../api/projectApi";
 import { getUsers, UserData } from "../../../api/userApi";
+import { projectFormFields, projectFormConfig, projectValidationRules } from "../project-Config";
 import "./add-project.scss";
 
 interface ProjectFormData {
@@ -16,17 +19,30 @@ interface ProjectFormData {
 const AddProject: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [managers, setManagers] = useState<Array<{ label: string; value: string }>>([]);
+  const [loading, setLoading] = useState(true);
+  const [formFields, setFormFields] = useState(projectFormFields);
 
   useEffect(() => {
     const fetchManagers = async () => {
       try {
-        const users = await getUsers();
-        const formattedManagers = (users.users || []).map((user: UserData) => ({
-          label: user.user_fullname,
-          value: user.emp_id,
-        }));
-        setManagers(formattedManagers);
+        const usersResponse = await getUsers(1, 100);
+        const users = usersResponse.users || [];
+        
+        // Update form fields with dynamic options
+        const updatedFormFields = projectFormFields.map(field => {
+          if (field.name === 'project_manager') {
+            return {
+              ...field,
+              options: users.map((user: UserData) => ({
+                value: user.user_sno,
+                label: user.user_fullname
+              }))
+            };
+          }
+          return field;
+        });
+
+        setFormFields(updatedFormFields);
       } catch (error) {
         console.error("Error fetching managers:", error);
         showToast({
@@ -34,61 +50,46 @@ const AddProject: React.FC = () => {
           message: "Failed to load managers. Please try again.",
           duration: 5000,
         });
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchManagers();
-  }, []);
-
-  const formFields = [
-    {
-      label: "Project Name",
-      Key: "project_name",
-      type: "text",
-      name: "project_name",
-      required: true,
-      placeholder: "Enter project name",
-    },
-    {
-      label: "Project Manager",
-      Key: "project_manager",
-      type: "select",
-      name: "project_manager",
-      required: true,
-      placeholder: "Select project manager",
-      options: managers,
-    },
-    {
-      label: "Description",
-      Key: "project_description",
-      type: "text",
-      name: "project_description",
-      required: true,
-      placeholder: "Enter project description",
-    },
-    {
-      label: "Status",
-      Key: "project_status",
-      type: "select",
-      name: "project_status",
-      required: true,
-      placeholder: "Select project status",
-      options: [
-        { label: "Active", value: "ACTIVE" },
-        { label: "Inactive", value: "INACTIVE" },
-        { label: "Completed", value: "COMPLETED" },
-      ],
-    },
-  ];
-
-  const formConfig = {
-    formTitle: "Add New Project",
-    submitButtonText: "Save",
-    cancelButtonText: "Cancel",
-  };
+  }, [showToast]);
 
   const handleSubmit = async (formData: ProjectFormData) => {
     try {
+      // Check if user has permission to create projects
+      if (!permissionAccess(PERMISSIONS.CREATE_PROJECT)) {
+        showToast({
+          type: "error",
+          message: "You don't have permission to create projects.",
+          duration: 5000
+        });
+        return;
+      }
+
+      // Validate form data
+      const validationErrors: string[] = [];
+      
+      if (!formData.project_name || formData.project_name.length > 30) {
+        validationErrors.push(projectValidationRules.project_name.maxLength || "Project name validation failed");
+      }
+      
+      if (!formData.project_manager) {
+        validationErrors.push(projectValidationRules.project_manager.required || "Project manager selection required");
+      }
+
+      if (validationErrors.length > 0) {
+        showToast({
+          type: "error",
+          message: validationErrors.join(", "),
+          duration: 5000
+        });
+        return;
+      }
+
       await createProject({
         ...formData,
         project_manager: Number(formData.project_manager),
@@ -113,13 +114,17 @@ const AddProject: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
   return (
     <div className="add-project-container">
       <ReusableForm
         fields={formFields}
         onSubmit={handleSubmit}
         onCancel={() => navigate("/project")}
-        config={formConfig}
+        config={projectFormConfig}
       />
     </div>
   );

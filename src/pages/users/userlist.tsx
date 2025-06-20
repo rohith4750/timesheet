@@ -4,22 +4,15 @@ import TableComponent from "../../components/table/table";
 import { permissionAccess } from "../../hooks/permissionAccess";
 import Button from "../../components/button/button";
 import { useToast } from "../../components/toast/ToastContext";
-//import PermissionDenied from "../../components/shared/permission-denied/PermissionDenied";
 import {
   getUsers,
   deleteUser,
   UserData,
   checkSuperAdmin,
 } from "../../api/userApi";
-import axios from "axios";
 import "./userlist.scss";
 import { PERMISSIONS } from "../../constants/permissions";
-
-interface UserListApiResponse {
-  data: UserData[];
-  total: number;
-  message: string;
-}
+import { userTableColumns } from "./user-config";
 
 interface FilterParams {
   filters?: Record<keyof UserData, string>;
@@ -38,203 +31,118 @@ type AxiosError = {
 const UserList = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [loading, setLoading] = useState(true);
-
-  // Check if user has permission to view users
-  const hasViewUserPermission = permissionAccess(PERMISSIONS.VIEW_USER);
 
   useEffect(() => {
-    const checkAdminStatus = async () => {
+    const verifyPermission = async () => {
       try {
         const isAdmin = await checkSuperAdmin();
-        setIsSuperAdmin(isAdmin);
+        localStorage.setItem("isSuperAdmin", String(isAdmin));
+        const canView = permissionAccess(PERMISSIONS.VIEW_USER);
+        setHasPermission(canView);
       } catch (error) {
         console.error("Error checking admin status:", error);
-        if ((error as AxiosError)?.response?.status === 401) {
-          navigate("/login");
-        }
+        localStorage.setItem("isSuperAdmin", "false");
+        setHasPermission(permissionAccess(PERMISSIONS.VIEW_USER));
       }
     };
-    checkAdminStatus();
+    verifyPermission();
   }, [navigate]);
 
-  const columns = [
-    {
-      sortable: true,
-      key: "user_sno",
-      label: "S.No",
-      field: "user_sno",
-    },
-    {
-      sortable: true,
-      key: "user_id",
-      label: "User ID",
-      field: "user_id",
-    },
-    {
-      sortable: true,
-      key: "user_name",
-      label: "User Name",
-      field: "user_name",
-    },
-    {
-      sortable: true,
-      key: "user_phone",
-      label: "Phone",
-      field: "user_phone",
-    },
-    {
-      sortable: true,
-      key: "user_email",
-      label: "Email",
-      field: "user_email",
-    },
-    {
-      sortable: false,
-      key: "action",
-      label: "Actions",
-      field: "action",
-      type: "action",
-      list: [
-        {
-          label: "edit",
-          btnType: "icon",
-        },
-        {
-          label: "delete",
-          btnType: "icon",
-        },
-      ],
-    },
-  ];
+  useEffect(() => {
+    if (hasPermission === false) {
+      showToast({
+        type: "error",
+        message: "You don't have permission to view this page.",
+        duration: 3000,
+      });
+      navigate("/home-page");
+    }
+  }, [hasPermission, navigate, showToast]);
 
   const fetchData = useCallback(
     async (params: FilterParams) => {
       try {
         const response = await getUsers(params.page || 1, params.limit || 10);
-        console.log("API Response:", response); // Debug
-
         if (!response || !response.users) {
-          console.error("Invalid response format:", response);
-          return { data: [], total: 0, users: [] };
+          return { data: [], total: 0 };
         }
-
-        // Ensure data is properly formatted for the table
         const formattedData = response.users.map((user: UserData) => ({
           ...user,
-          id: user.user_sno, // Ensure ID field is present
-          actions: true, // Enable row actions
+          id: user.user_sno,
+          actions: true,
         }));
-
         return {
           data: formattedData,
-          total: formattedData.length,
+          total: response.total,
           users: formattedData,
         };
       } catch (error) {
-        console.error("Error fetching users:", error);
-
-        // Handle specific error cases
-        if ((error as AxiosError)?.response?.status === 401) {
-          navigate("/login");
-          return { data: [], total: 0, users: [] };
-        }
-
-        if ((error as AxiosError)?.response?.status === 403) {
-          // Show permission denied message
+        if ((error as AxiosError)?.response?.status !== 403) {
           showToast({
             type: "error",
-            message:
-              "You don't have permission to view users. Please contact your administrator.",
-            duration: 5000,
+            message: "Failed to fetch users.",
+            duration: 3000,
           });
-          return { data: [], total: 0, users: [] };
         }
-
-        // Handle other errors
-        showToast({
-          type: "error",
-          message: "Failed to load users. Please try again later.",
-          duration: 3000,
-        });
-
-        return { data: [], total: 0, users: [] }; // Return empty data on error
-      } finally {
-        setLoading(false);
+        return { data: [], total: 0 };
       }
     },
-    [navigate, refreshTrigger, showToast]
+    [showToast]
   );
 
   const handleEdit = (item: UserData) => {
     navigate(`/user/edit/${item.user_sno}`);
   };
 
-  const handleDelete = async (item: UserData): Promise<{ message: string }> => {
+  const handleDelete = async (item: UserData) => {
     try {
-      if (!item.user_sno) throw new Error("User SNO is required");
-      const response = await deleteUser(item.user_sno);
+      await deleteUser(item.user_sno as number);
+      showToast({ type: "success", message: "User deleted." });
       setRefreshTrigger((prev) => prev + 1);
-      showToast({
-        type: "success",
-        message: "User deleted successfully",
-        duration: 2000,
-      });
       return { message: "User deleted successfully" };
     } catch (error) {
-      console.error("Error deleting user:", error);
-      if ((error as AxiosError)?.response?.status === 401) {
-        navigate("/login");
-      }
-      showToast({
-        type: "error",
-        message: "Failed to delete user. Please try again.",
-        duration: 5000,
-      });
+      showToast({ type: "error", message: "Failed to delete user." });
       throw new Error("Failed to delete user");
     }
   };
 
-  useEffect(() => {
-    setRefreshTrigger((prev) => prev + 1);
-  }, []);
+  if (hasPermission === null) {
+    return <div>Verifying permissions...</div>;
+  }
 
-  // Show permission denied message if user doesn't have access
-  // if (!hasViewUserPermission) {
-  //   return (
-  //     <div className="user-list-container">
-  //       <PermissionDenied
-  //         title="Access Denied"
-  //         message="You don't have permission to view the users list."
-  //       />
-  //     </div>
-  //   );
-  // }
+  if (hasPermission === false) {
+    return null;
+  }
 
   return (
     <div className="user-list-container">
       <div className="user-list-header">
+        <h1>User Management</h1>
         {permissionAccess(PERMISSIONS.CREATE_USER) && (
-          <Button variant="primary" onClick={() => navigate("/user/add")}>
-            Add User
+          <Button
+            onClick={() => navigate("/user/add")}
+            showPlusIcon
+            variant="primary"
+          >
+            Add New User
           </Button>
         )}
       </div>
 
       <TableComponent
-        columns={columns}
-        fetchData={fetchData}
+        key={refreshTrigger}
+        columns={userTableColumns}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        heading="Users"
-        deletePermission="DELETE_USER"
-        updatePermission="UPDATE_USER"
-        createPermission="CREATE_USER"
+        fetchData={fetchData}
         dataKey="users"
-        textkey="user"
-        actions={true}
+        textkey="user_fullname"
+        heading="User"
+        createPermission={PERMISSIONS.CREATE_USER}
+        deletePermission={PERMISSIONS.DELETE_USER}
+        updatePermission={PERMISSIONS.EDIT_USER}
       />
     </div>
   );

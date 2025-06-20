@@ -69,11 +69,12 @@ const Login: React.FC = () => {
           console.log("API call successful, processing response...");
           // Use the actual role from the API response
           const userRole = response.role || 'USER'; // Default to USER if no role provided
+          const userName = response.user_name || 'Unknown User';
           console.log("User role from API:", userRole);
           
           console.log("About to call auth service login function...");
           // Call the login function from auth context with the actual role
-          await login(response.token, { role: userRole });
+          await login(response.token, { role: userRole, username: userName });
           console.log("Auth login completed successfully");
           
           showToast({
@@ -141,56 +142,6 @@ const Login: React.FC = () => {
             <Button type="submit" variant="primary" size="large" fullWidth>
               Login
             </Button>
-            
-            {/* Test button for debugging */}
-            <div style={{ marginTop: '10px' }}>
-              <Button 
-                type="button" 
-                variant="secondary" 
-                size="large" 
-                fullWidth
-                onClick={() => {
-                  console.log("Testing auth login manually");
-                  login("test-token", { role: "ADMIN" });
-                }}
-              >
-                Test Auth Login
-              </Button>
-            </div>
-            
-            {/* Test localStorage directly */}
-            <div style={{ marginTop: '10px' }}>
-              <Button 
-                type="button" 
-                variant="secondary" 
-                size="large" 
-                fullWidth
-                onClick={() => {
-                  console.log("Testing localStorage directly");
-                  try {
-                    localStorage.setItem('test', 'test-value');
-                    const testValue = localStorage.getItem('test');
-                    console.log("localStorage test result:", testValue);
-                    localStorage.removeItem('test');
-                    
-                    // Test auth data storage
-                    localStorage.setItem('auth_token', JSON.stringify({ accessToken: 'test', expiresIn: Date.now() + 3600000 }));
-                    localStorage.setItem('isLogin', 'true');
-                    localStorage.setItem('userRole', 'ADMIN');
-                    
-                    console.log("localStorage after manual set:", {
-                      auth_token: localStorage.getItem('auth_token'),
-                      isLogin: localStorage.getItem('isLogin'),
-                      userRole: localStorage.getItem('userRole')
-                    });
-                  } catch (error) {
-                    console.error("localStorage test failed:", error);
-                  }
-                }}
-              >
-                Test localStorage
-              </Button>
-            </div>
           </form>
         </div>
       </div>

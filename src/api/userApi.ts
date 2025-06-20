@@ -103,27 +103,10 @@ export const updateProfile = async (userId: number, profileData: Partial<UserDat
   return response.data;
 };
 
-// Update super admin profile
-export const updateSuperAdminProfile = async (userId: number, profileData: Partial<UserData>): Promise<UserResponse> => {
-  const response = await api.put<UserResponse>(`/super-admin/profile/${userId}`, profileData);
-  return response.data;
-};
-
 // Change password
 export const changePassword = async (passwordData: { currentPassword: string; newPassword: string }): Promise<UserResponse> => {
   const response = await api.put<UserResponse>('/change-password', passwordData);
   return response.data;
-};
-
-// Check if user is super admin
-export const checkSuperAdmin = async (): Promise<boolean> => {
-  try {
-    const response = await api.get<{ is_super_admin: boolean }>('/check/is_super_admin');
-    return response.data.is_super_admin;
-  } catch (error) {
-    console.error('Error checking super admin status:', error);
-    return false;
-  }
 };
 
 // Fetch single user

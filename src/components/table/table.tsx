@@ -43,8 +43,6 @@ interface TableComponentProps {
   fetchData: (params: any) => Promise<any>;
   onEdit?: (item: any) => void;
   onDelete?: (item: any) => Promise<{ message: string }>;
-  onSystemAdminAction?(item: any): any;
-  // onUndo: (item: any) => Promise<{ message: string }>
   dataKey: string;
   textkey: string;
   heading?: string;
@@ -95,7 +93,6 @@ export default function TableComponent({
   deletePermission,
   updatePermission,
   icon,
-  onSystemAdminAction,
   eventKey,
   actions = true,
   daySearch = false,

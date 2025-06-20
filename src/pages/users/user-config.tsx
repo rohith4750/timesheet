@@ -14,6 +14,7 @@ export interface UserFormField {
   defaultValue?: string | number | boolean;
   step?: number;
   pattern?: string;
+  validation?: (value: string, isEdit: boolean) => boolean | string;
 }
 
 export interface UserTableColumn {
@@ -93,9 +94,15 @@ export const userFormFields: UserFormField[] = [
     label: "Password",
     type: "password",
     name: "password",
-    required: true, // Will be conditionally set based on create/edit mode
+    required: true,
     placeholder: "Enter Password",
     maxLength: 50,
+    validation: (value, isEdit) => {
+      if (isEdit) return true;
+      if (!value) return "Password is required.";
+      if (value.length < 6) return "Password must be at least 6 characters.";
+      return true;
+    },
   },
   {
     label: "User Status",
@@ -108,13 +115,6 @@ export const userFormFields: UserFormField[] = [
       { value: "INACTIVE", label: "Inactive" },
     ],
     defaultValue: "ACTIVE",
-  },
-  {
-    label: "Super Admin",
-    type: "checkbox",
-    name: "is_super_admin",
-    required: false,
-    defaultValue: false,
   },
   {
     label: "Role",
@@ -291,9 +291,8 @@ export const userStatusOptions = [
 
 // Role options (will be populated dynamically)
 export const roleOptions = [
-  { value: 1, label: "Admin" },
-  { value: 2, label: "User" },
-  { value: 3, label: "Manager" },
+  { value: 2, label: "Project Manager" },
+  { value: 3, label: "User" },
 ];
 
 // Export default configuration object

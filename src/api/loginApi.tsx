@@ -6,14 +6,16 @@ interface LoginFormData {
 interface LoginResponse {
   success: boolean;
   token?: string;
-  message?: string;
   role?: string;
+  user_name?: string;
+  message?: string;
 }
 
 interface ApiLoginResponse {
   accessToken: string;
   refreshToken: string;
   role?: string;
+  user_name?: string;
 }
 
 export const loginUser = async (
@@ -53,7 +55,8 @@ export const loginUser = async (
     return {
       success: true,
       token: data.accessToken,
-      role: data.role
+      role: data.role,
+      user_name: data.user_name
     };
   } catch (error) {
     return {

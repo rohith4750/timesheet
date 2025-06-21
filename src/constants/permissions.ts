@@ -62,6 +62,7 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   [ROLES.USER]: [
     PERMISSIONS.VIEW_PROJECT,
     PERMISSIONS.VIEW_TASK,
+    PERMISSIONS.CREATE_TASK,
     PERMISSIONS.VIEW_PROJECT_ASSIGNMENTS
   ] as const
 };

@@ -19,6 +19,7 @@ import refreshIcon from "../../assets/images/restart.svg";
 import deletePopup from "../../assets/images/delete-icon.svg";
 import Button from "../button/button";
 import { permissionAccess } from "../../common-methods/hooks/permissionAccess";
+import viewIcon from "../../assets/icons/open-icon.svg";
 
 interface Alert {
   type: "success" | "error" | "warning" | "info";
@@ -44,6 +45,7 @@ interface TableComponentProps {
   }[];
   fetchData: (params: any) => Promise<any>;
   onEdit?: (item: any) => void;
+  onView?: (item: any) => void;
   onDelete?: (item: any) => Promise<{ message: string }>;
   dataKey: string;
   textkey: string;
@@ -58,6 +60,7 @@ interface TableComponentProps {
   createPermission: string;
   deletePermission: string;
   updatePermission: string;
+  viewPermission?: string;
   dashboardKey?: string;
   icon?: string;
   eventKey?(item: any): any;
@@ -69,6 +72,7 @@ interface TableComponentProps {
   showColumnSelector?: boolean;
   showResetButton?: boolean;
   showSearchInput?: boolean;
+  isAdmin?: boolean;
 }
 
 interface CustomDialogProps {
@@ -84,6 +88,7 @@ export default function TableComponent({
   fetchData,
   buttonKey,
   onEdit = undefined, // Default to undefined
+  onView = undefined,
   onDelete = undefined, // Default to undefined
 
   // onUndo,
@@ -95,6 +100,7 @@ export default function TableComponent({
   deletePermission,
   updatePermission,
   createPermission,
+  viewPermission,
   icon,
   eventKey,
   actions = true,
@@ -102,6 +108,7 @@ export default function TableComponent({
   showColumnSelector = true,
   showSearchInput = true,
   showResetButton = true,
+  isAdmin,
 }: // clearButton = false,
 TableComponentProps) {
   const [data, setData] = useState<any[]>([]);
@@ -274,13 +281,13 @@ TableComponentProps) {
   }, [actionType, onEdit, selectedItem, handleDelete, navigate, textkey]);
 
   const handleActionSingle = () => {
-    navigate(`/${textkey}s/add-${textkey}`);
+    navigate(`/${textkey}/add`);
   };
 
   // system admin action condition
 
   const handleActionMultiple = () => {
-    navigate(`/${textkey}s/add-multiple-${textkey}s`);
+    navigate(`/${textkey}/add-multiple`);
   };
 
   const toggleColumn = (key: string) => {
@@ -817,17 +824,38 @@ TableComponentProps) {
                                             {btnlist.label === "edit" && (
                                               <button
                                                 className="edit-btn"
-                                                disabled={item.disableActions}
-                                                onClick={() => {
-                                                  setIsDialogOpen(true);
-                                                  setSelectedItem(item);
-                                                  setActionType("0");
-                                                }}
+                                                disabled={
+                                                  !permissionAccess(
+                                                    updatePermission
+                                                  ) || item.disableActions
+                                                }
+                                                onClick={() =>
+                                                  onEdit && onEdit(item)
+                                                }
                                               >
                                                 <img
                                                   className="edit-icon"
                                                   src={edit}
                                                   alt="Edit"
+                                                />
+                                              </button>
+                                            )}
+                                            {onView && viewPermission && isAdmin && (
+                                              <button
+                                                className="view-btn"
+                                                disabled={
+                                                  !permissionAccess(
+                                                    viewPermission
+                                                  ) || item.disableActions
+                                                }
+                                                onClick={() =>
+                                                  onView && onView(item)
+                                                }
+                                              >
+                                                <img
+                                                  className="view-icon"
+                                                  src={viewIcon}
+                                                  alt="View"
                                                 />
                                               </button>
                                             )}
@@ -919,7 +947,28 @@ TableComponentProps) {
                                 {item[col.key]}
                               </td>
                             );
+                          } else if (col?.render) {
+                            return (
+                              <td key={col.key}>
+                                {col.render(item)}
+                              </td>
+                            );
                           } else {
+                            if (col.key === 'view_task' && onView && viewPermission && isAdmin) {
+                              return (
+                                <td key={col.key}>
+                                  <button
+                                    className="view-btn"
+                                    disabled={
+                                      !permissionAccess(viewPermission) || item.disableActions
+                                    }
+                                    onClick={() => onView && onView(item)}
+                                  >
+                                    <img className="view-icon" src={viewIcon} alt="View" />
+                                  </button>
+                                </td>
+                              );
+                            }
                             return <td key={col.key}>{item[col.key]}</td>;
                           }
                         })}

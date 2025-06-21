@@ -90,7 +90,7 @@ const HomePage: React.FC = () => {
         {tasks.length > 0 ? (
           <div className="task-list">
             {tasks.map((task) => (
-              <div key={task.task_sno} className="task-card">
+              <div key={task.ut_sno} className="task-card">
                 <h3>{task.task_name}</h3>
                 <p>{task.task_description}</p>
                 <div className="task-meta">

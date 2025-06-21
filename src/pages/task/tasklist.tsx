@@ -11,6 +11,7 @@ import {
 } from "../../api/taskApi";
 import { Permission, PERMISSIONS } from "../../constants/permissions";
 import { taskTableColumns } from "./task-config";
+import TaskViewModal from "../../components/task-view-modal/task-view-modal";
 
 interface FilterParams {
   filters?: Record<keyof TaskData, string>;
@@ -22,6 +23,11 @@ const TaskList = () => {
   const [data, setData] = useState<TaskData[]>([]);
   const [filteredData, setFilteredData] = useState<TaskData[]>([]);
   const [hasViewPermission, setHasViewPermission] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<TaskData | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+  const userRole = (localStorage.getItem('userRole') || '').toUpperCase();
+  const isAdmin = userRole === 'ADMIN';
 
   useEffect(() => {
     const checkPermission = () => {
@@ -111,7 +117,7 @@ const TaskList = () => {
       });
       return;
     }
-    navigate(`/task/edit/${item.task_sno}`);
+    navigate(`/task/edit/${item.ut_sno}`);
   };
 
   const handleDelete = async (item: TaskData): Promise<{ message: string }> => {
@@ -125,8 +131,8 @@ const TaskList = () => {
     }
 
     try {
-      if (!item.task_sno) throw new Error("Task ID is required");
-      await deleteTask(Number(item.task_sno));
+      if (!item.ut_sno) throw new Error("Task ID is required");
+      await deleteTask(Number(item.ut_sno));
       showToast({
         type: "success",
         message: "Task deleted successfully",
@@ -143,6 +149,30 @@ const TaskList = () => {
     }
   };
 
+  const handleViewTask = (item: TaskData) => {
+    setSelectedTask(item);
+    setIsViewModalOpen(true);
+  };
+
+  const handleTaskUpdated = () => {
+    // Refresh the data when a task is approved/rejected
+    fetchData({});
+  };
+
+  const handleCloseViewModal = () => {
+    setIsViewModalOpen(false);
+    setSelectedTask(null);
+  };
+
+  // Create custom columns with view task functionality for admin users
+  const getCustomColumns = () => {
+    if (isAdmin) {
+      return taskTableColumns;
+    }
+
+    return taskTableColumns.filter(column => column.key !== 'view_task');
+  };
+
   if (!hasViewPermission) {
     return null;
   }
@@ -154,9 +184,10 @@ const TaskList = () => {
       </div> */}
 
       <TableComponent
-        columns={taskTableColumns}
+        columns={getCustomColumns()}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onView={handleViewTask}
         fetchData={fetchData}
         dataKey="userTasks"
         textkey="task"
@@ -164,7 +195,16 @@ const TaskList = () => {
         createPermission={PERMISSIONS.CREATE_TASK}
         deletePermission={PERMISSIONS.DELETE_TASK}
         updatePermission={PERMISSIONS.EDIT_TASK}
+        viewPermission={PERMISSIONS.VIEW_TASK}
+        isAdmin={isAdmin}
         navKey={true}
+      />
+
+      <TaskViewModal
+        isOpen={isViewModalOpen}
+        onClose={handleCloseViewModal}
+        task={selectedTask}
+        onTaskUpdated={handleTaskUpdated}
       />
     </div>
   );

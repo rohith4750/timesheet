@@ -50,7 +50,7 @@ export const routes: RouteConfig[] = [
     element: componentMap["/task/add"],
   },
   {
-    path: "/task/edit",
+    path: "/task/edit/:taskId",
     element: componentMap["/task/edit"],
   },
   {

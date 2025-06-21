@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Task configuration
 export {}; // Makes this file a module
 
@@ -24,6 +26,7 @@ export interface TaskTableColumn {
   field: string;
   filterType: 'text' | 'select' | 'number' | 'date';
   filterOptions?: Array<{ value: string; label: string }>;
+  render?: (item: any) => React.ReactNode;
 }
 
 // Form fields configuration for creating/editing tasks
@@ -148,6 +151,13 @@ export const taskTableColumns: TaskTableColumn[] = [
     label: "Updated Date",
     field: "updated_at",
     filterType: "date",
+  },
+  {
+    sortable: false,
+    key: "view_task",
+    label: "View Task",
+    field: "view_task",
+    filterType: "text",
   },
 ];
 

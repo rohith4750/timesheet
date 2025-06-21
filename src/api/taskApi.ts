@@ -1,7 +1,7 @@
 import { api, handleApiError } from './config';
 
 export interface TaskData {
-  task_sno: number;
+  ut_sno: number;
   task_name: string;
   task_description: string;
   task_status: string;
@@ -77,7 +77,7 @@ export const getTaskById = async (id: number): Promise<TaskData> => {
 };
 
 // Create new task
-export const createTask = async (taskData: Omit<TaskData, 'task_sno' | 'created_at' | 'updated_at'>): Promise<TaskCreateResponse> => {
+export const createTask = async (taskData: Omit<TaskData, 'ut_sno' | 'created_at' | 'updated_at'>): Promise<TaskCreateResponse> => {
   try {
     const response = await api.post<TaskCreateResponse>('/create/task', taskData);
     return response.data;
@@ -149,5 +149,17 @@ export const updateTaskStatus = async (taskId: number, status: string): Promise<
 // Update task priority
 export const updateTaskPriority = async (taskId: number, priority: string): Promise<TaskResponse> => {
   const response = await api.put<TaskResponse>(`/task/${taskId}/priority`, { priority });
+  return response.data;
+};
+
+// Approve task
+export const approveTask = async (taskId: number): Promise<TaskResponse> => {
+  const response = await api.patch<TaskResponse>(`/approve/user_task/${taskId}`);
+  return response.data;
+};
+
+// Reject task
+export const rejectTask = async (taskId: number): Promise<TaskResponse> => {
+  const response = await api.patch<TaskResponse>(`/reject/user_task/${taskId}`);
   return response.data;
 }; 

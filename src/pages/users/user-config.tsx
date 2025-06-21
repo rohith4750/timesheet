@@ -19,12 +19,11 @@ export interface UserFormField {
 
 export interface UserTableColumn {
   sortable: boolean;
-  key: string;
+  key: any;
   label: string;
   field: string;
   filterType: 'text' | 'select' | 'number' | 'date';
   filterOptions?: Array<{ value: string; label: string }>;
-  width?: string;
 }
 
 // Form fields configuration for creating/editing users
@@ -134,7 +133,6 @@ export const userTableColumns: UserTableColumn[] = [
     label: "S.No",
     field: "user_sno",
     filterType: "number",
-    width: "80px",
   },
   {
     sortable: true,
@@ -142,7 +140,6 @@ export const userTableColumns: UserTableColumn[] = [
     label: "Employee ID",
     field: "emp_id",
     filterType: "text",
-    width: "120px",
   },
   {
     sortable: true,
@@ -150,7 +147,6 @@ export const userTableColumns: UserTableColumn[] = [
     label: "Full Name",
     field: "user_fullname",
     filterType: "text",
-    width: "200px",
   },
   {
     sortable: true,
@@ -158,7 +154,6 @@ export const userTableColumns: UserTableColumn[] = [
     label: "First Name",
     field: "user_firstname",
     filterType: "text",
-    width: "150px",
   },
   {
     sortable: true,
@@ -166,7 +161,6 @@ export const userTableColumns: UserTableColumn[] = [
     label: "Middle Name",
     field: "user_middlename",
     filterType: "text",
-    width: "150px",
   },
   {
     sortable: true,
@@ -174,7 +168,6 @@ export const userTableColumns: UserTableColumn[] = [
     label: "Last Name",
     field: "user_lastname",
     filterType: "text",
-    width: "150px",
   },
   {
     sortable: true,
@@ -182,7 +175,6 @@ export const userTableColumns: UserTableColumn[] = [
     label: "Phone",
     field: "user_phone",
     filterType: "text",
-    width: "130px",
   },
   {
     sortable: true,
@@ -190,7 +182,6 @@ export const userTableColumns: UserTableColumn[] = [
     label: "Email",
     field: "user_email",
     filterType: "text",
-    width: "200px",
   },
   {
     sortable: true,
@@ -202,7 +193,6 @@ export const userTableColumns: UserTableColumn[] = [
       { value: "ACTIVE", label: "Active" },
       { value: "INACTIVE", label: "Inactive" },
     ],
-    width: "100px",
   },
   {
     sortable: true,
@@ -210,7 +200,6 @@ export const userTableColumns: UserTableColumn[] = [
     label: "Role",
     field: "role_name",
     filterType: "select",
-    width: "120px",
   },
   {
     sortable: true,
@@ -218,7 +207,6 @@ export const userTableColumns: UserTableColumn[] = [
     label: "Created Date",
     field: "created_at",
     filterType: "date",
-    width: "150px",
   },
   {
     sortable: true,
@@ -226,7 +214,6 @@ export const userTableColumns: UserTableColumn[] = [
     label: "Updated Date",
     field: "updated_at",
     filterType: "date",
-    width: "150px",
   },
 ];
 

@@ -18,12 +18,11 @@ export interface ProjectFormField {
 
 export interface ProjectTableColumn {
   sortable: boolean;
-  key: string;
+  key: any;
   label: string;
   field: string;
   filterType: 'text' | 'select' | 'number' | 'date';
   filterOptions?: Array<{ value: string; label: string }>;
-  width?: string;
 }
 
 // Form fields configuration for creating/editing projects
@@ -73,7 +72,6 @@ export const projectTableColumns: ProjectTableColumn[] = [
     label: "Project Name",
     field: "project_name",
     filterType: "text",
-    width: "200px",
   },
   {
     sortable: true,
@@ -81,7 +79,6 @@ export const projectTableColumns: ProjectTableColumn[] = [
     label: "Description",
     field: "project_description",
     filterType: "text",
-    width: "300px",
   },
   {
     sortable: true,
@@ -93,7 +90,6 @@ export const projectTableColumns: ProjectTableColumn[] = [
       { value: "ACTIVE", label: "Active" },
       { value: "INACTIVE", label: "Inactive" },
     ],
-    width: "120px",
   },
   {
     sortable: true,
@@ -101,7 +97,6 @@ export const projectTableColumns: ProjectTableColumn[] = [
     label: "Project Manager",
     field: "project_manager",
     filterType: "select",
-    width: "150px",
   },
   {
     sortable: true,
@@ -109,7 +104,6 @@ export const projectTableColumns: ProjectTableColumn[] = [
     label: "Created Date",
     field: "created_at",
     filterType: "date",
-    width: "150px",
   },
   {
     sortable: true,
@@ -117,7 +111,6 @@ export const projectTableColumns: ProjectTableColumn[] = [
     label: "Updated Date",
     field: "updated_at",
     filterType: "date",
-    width: "150px",
   },
 ];
 

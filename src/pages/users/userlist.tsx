@@ -50,7 +50,7 @@ const UserList = () => {
 
   return (
     <div className="user-list-container">
-      <div className="user-list-header">
+      {/* <div className="user-list-header">
         <h1>User Management</h1>
         {permissionAccess(PERMISSIONS.CREATE_USER) && (
           <Button
@@ -61,7 +61,7 @@ const UserList = () => {
             Add New User
           </Button>
         )}
-      </div>
+      </div> */}
 
       <TableComponent
         key={refreshTrigger}

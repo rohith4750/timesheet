@@ -711,3 +711,25 @@ button:disabled {
     transform: rotate(180deg);
   }
 }
+
+.navigation-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 0 12px;
+
+  .d-none {
+    display: none;
+  }
+
+  .outline {
+    &.mr-2pt {
+      margin-right: 0.5rem;
+    }
+    
+    &.ml-2pt {
+      margin-left: 0.5rem;
+    }
+  }
+}

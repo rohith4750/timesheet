@@ -19,12 +19,11 @@ export interface TaskFormField {
 
 export interface TaskTableColumn {
   sortable: boolean;
-  key: string;
+  key: any;
   label: string;
   field: string;
   filterType: 'text' | 'select' | 'number' | 'date';
   filterOptions?: Array<{ value: string; label: string }>;
-  width?: string;
 }
 
 // Form fields configuration for creating/editing tasks
@@ -94,7 +93,6 @@ export const taskTableColumns: TaskTableColumn[] = [
     label: "User",
     field: "user_sno",
     filterType: "select",
-    width: "120px",
   },
   {
     sortable: true,
@@ -102,7 +100,6 @@ export const taskTableColumns: TaskTableColumn[] = [
     label: "Project",
     field: "project_sno",
     filterType: "select",
-    width: "150px",
   },
   {
     sortable: true,
@@ -110,7 +107,6 @@ export const taskTableColumns: TaskTableColumn[] = [
     label: "Task Name",
     field: "task_name",
     filterType: "text",
-    width: "200px",
   },
   {
     sortable: true,
@@ -118,7 +114,6 @@ export const taskTableColumns: TaskTableColumn[] = [
     label: "Description",
     field: "task_description",
     filterType: "text",
-    width: "250px",
   },
   {
     sortable: true,
@@ -132,7 +127,6 @@ export const taskTableColumns: TaskTableColumn[] = [
       { value: "approved", label: "Approved" },
       { value: "rejected", label: "Rejected" },
     ],
-    width: "120px",
   },
   {
     sortable: true,
@@ -140,7 +134,6 @@ export const taskTableColumns: TaskTableColumn[] = [
     label: "Hours",
     field: "no_of_hours",
     filterType: "number",
-    width: "100px",
   },
   {
     sortable: true,
@@ -148,7 +141,6 @@ export const taskTableColumns: TaskTableColumn[] = [
     label: "Created Date",
     field: "created_at",
     filterType: "date",
-    width: "150px",
   },
   {
     sortable: true,
@@ -156,7 +148,6 @@ export const taskTableColumns: TaskTableColumn[] = [
     label: "Updated Date",
     field: "updated_at",
     filterType: "date",
-    width: "150px",
   },
 ];
 

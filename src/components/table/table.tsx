@@ -17,6 +17,8 @@ import Alerts from "../toast/toast";
 import { Modal } from "../../components/modal/modal";
 import refreshIcon from "../../assets/images/restart.svg";
 import deletePopup from "../../assets/images/delete-icon.svg";
+import Button from "../button/button";
+import { permissionAccess } from "../../common-methods/hooks/permissionAccess";
 
 interface Alert {
   type: "success" | "error" | "warning" | "info";
@@ -92,6 +94,7 @@ export default function TableComponent({
   filterRequiredKey = false,
   deletePermission,
   updatePermission,
+  createPermission,
   icon,
   eventKey,
   actions = true,
@@ -440,6 +443,46 @@ TableComponentProps) {
           </div>
         )}
       </div>
+
+      {navKey ? (
+        <div className="navigation-buttons">
+          <div className={!permissionAccess(createPermission) ? 'd-none' : ''}>
+            <Button
+              onClick={handleActionSingle}
+              variant="primary"
+              showPlusIcon
+              disabled={!permissionAccess(createPermission)}
+            >
+              {heading && `Add ${heading.endsWith('s') ? heading.slice(0, -1) : heading}`}
+              {currentTab && `Add ${currentTab.slice(0, -1)}`}
+            </Button>
+          </div>
+
+          {buttonKey && (
+            <div className={!permissionAccess(createPermission) ? 'd-none' : ''}>
+              <Button
+                onClick={handleActionMultiple}
+                variant="primary"
+                showPlusIcon
+                disabled={!permissionAccess(createPermission)}
+              >
+                Add Multiple {heading}
+              </Button>
+            </div>
+          )}
+
+          {dashboardKey && (
+            <div className="outline mr-2pt ml-2pt">
+              <Button
+                onClick={() => navigate('/couriers')}
+                variant="secondary"
+              >
+                {dashboardKey}
+              </Button>
+            </div>
+          )}
+        </div>
+      ) : null}
 
       <div className="table-container">
         <div className={`table-wrapper ${isLoading ? "loading" : ""}`}>
@@ -941,6 +984,25 @@ TableComponentProps) {
       </div>
 
       <Alerts alerts={alerts} setAlerts={setAlerts} />
+      
+      <Modal
+        isOpen={isDialogOpen}
+        config={getModalConfig()}
+        onClose={() => setIsDialogOpen(false)}
+      />
+      
+      <Modal
+        isOpen={isDialogOpenCustom}
+        config={{
+          type: "confirmation",
+          message: customDialogData.message || "Are you sure?",
+          onPrimaryClick: confirmActionCustom,
+          onSecondaryClick: () => setIsDialogOpenCustom(false),
+          primaryButtonText: "CONFIRM",
+          secondaryButtonText: "CANCEL",
+        }}
+        onClose={() => setIsDialogOpenCustom(false)}
+      />
     </>
   );
 }

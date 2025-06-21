@@ -4,7 +4,6 @@ import TableComponent from "../../components/table/table";
 import { permissionAccess } from "../../hooks/permissionAccess";
 import { useToast } from "../../components/toast/ToastContext";
 import "./tasklist.scss";
-import Button from "../../components/button/button";
 import {
   getUserTasks,
   deleteTask,
@@ -52,10 +51,8 @@ const TaskList = () => {
       const page = 1; // TODO: Implement pagination
       const limit = 10;
       const response = await getUserTasks(page, limit);
-      console.log('API Response:', response); // Debug log
 
       if (!response || !response.userTasks) {
-        console.error('Invalid response format:', response);
         return {
           data: [],
           total: 0,
@@ -63,7 +60,6 @@ const TaskList = () => {
       }
 
       let filteredData = response.userTasks;
-      console.log('Initial filtered data:', filteredData); // Debug log
 
       // Apply filters if they exist
       if (params.filters) {
@@ -86,7 +82,6 @@ const TaskList = () => {
         });
       }
 
-      console.log('Final filtered data:', filteredData); // Debug log
       setData(filteredData);
       setFilteredData(filteredData);
 
@@ -95,7 +90,6 @@ const TaskList = () => {
         total: response.total || filteredData.length,
       };
     } catch (error) {
-      console.error("Error fetching tasks:", error);
       showToast({
         type: "error",
         message: "Failed to fetch tasks. Please try again.",
@@ -140,7 +134,6 @@ const TaskList = () => {
       });
       return { message: "Task deleted successfully" };
     } catch (error) {
-      console.error("Error deleting task:", error);
       showToast({
         type: "error",
         message: "Failed to delete task. Please try again.",
@@ -156,18 +149,9 @@ const TaskList = () => {
 
   return (
     <div className="task-list-container">
-      <div className="task-list-header">
+      {/* <div className="task-list-header">
         <h1>Task Management</h1>
-        {permissionAccess(PERMISSIONS.CREATE_TASK as Permission) && (
-          <Button
-            onClick={() => navigate("/task/add")}
-            showPlusIcon
-            variant="primary"
-          >
-            Add New Task
-          </Button>
-        )}
-      </div>
+      </div> */}
 
       <TableComponent
         columns={taskTableColumns}
@@ -175,12 +159,12 @@ const TaskList = () => {
         onDelete={handleDelete}
         fetchData={fetchData}
         dataKey="userTasks"
-        textkey="task_name"
+        textkey="task"
         heading="Task"
-        navKey={true}
         createPermission={PERMISSIONS.CREATE_TASK}
         deletePermission={PERMISSIONS.DELETE_TASK}
         updatePermission={PERMISSIONS.EDIT_TASK}
+        navKey={true}
       />
     </div>
   );
